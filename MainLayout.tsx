@@ -7,8 +7,8 @@ import {
   SafeAreaView,
   Animated,
   ScrollView,
-  Pressable,
 } from 'react-native';
+import { theme } from './src/theme/theme'; // Import your central theme tokens
 
 const COLLAPSED_WIDTH = 70;
 const EXPANDED_WIDTH = 220;
@@ -23,12 +23,11 @@ export default function MainLayout({ children, activeScreen, onNavigate }: MainL
   const [isExpanded, setIsExpanded] = useState(false);
   const sidebarWidthAnim = useRef(new Animated.Value(COLLAPSED_WIDTH)).current;
 
-  // Handles expanding/collapsing the sidebar smoothly
   const toggleSidebar = () => {
     Animated.timing(sidebarWidthAnim, {
       toValue: isExpanded ? COLLAPSED_WIDTH : EXPANDED_WIDTH,
       duration: 200,
-      useNativeDriver: false, // Layout widths require JS driver
+      useNativeDriver: false,
     }).start();
     setIsExpanded(!isExpanded);
   };
@@ -45,9 +44,8 @@ export default function MainLayout({ children, activeScreen, onNavigate }: MainL
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.shell}>
-        {/* --- PERSISTENT SIDEBAR RAIL --- */}
+        {/* SIDEBAR RAIL */}
         <Animated.View style={[styles.sidebar, { width: sidebarWidthAnim }]}>
-          {/* Header Toggle Button */}
           <View style={styles.sidebarHeader}>
             <TouchableOpacity onPress={toggleSidebar} style={styles.menuIconButton}>
               <Text style={styles.menuIconText}>☰</Text>
@@ -55,7 +53,6 @@ export default function MainLayout({ children, activeScreen, onNavigate }: MainL
             {isExpanded && <Text style={styles.brandTitle}>FormulaFlow</Text>}
           </View>
 
-          {/* Navigation Items */}
           <ScrollView style={styles.menuList} showsVerticalScrollIndicator={false}>
             {navItems.map((item) => {
               const isActive = activeScreen === item.id;
@@ -77,7 +74,7 @@ export default function MainLayout({ children, activeScreen, onNavigate }: MainL
           </ScrollView>
         </Animated.View>
 
-        {/* --- MAIN CONTENT AREA --- */}
+        {/* MAIN CONTENT AREA */}
         <View style={styles.contentArea}>{children}</View>
       </View>
     </SafeAreaView>
@@ -87,16 +84,16 @@ export default function MainLayout({ children, activeScreen, onNavigate }: MainL
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F7FA',
+    backgroundColor: theme.colors.background,
   },
   shell: {
     flex: 1,
     flexDirection: 'row',
   },
   sidebar: {
-    backgroundColor: '#1E293B',
+    backgroundColor: theme.colors.sidebarBg,
     borderRightWidth: 1,
-    borderRightColor: '#334155',
+    borderRightColor: theme.colors.sidebarBorder,
     paddingTop: 15,
     paddingHorizontal: 10,
     overflow: 'hidden',
@@ -108,19 +105,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 5,
   },
   menuIconButton: {
-    padding: 8,
+    padding: theme.spacing.sm,
     borderRadius: 6,
-    backgroundColor: '#334155',
+    backgroundColor: theme.colors.sidebarBorder,
   },
   menuIconText: {
-    color: '#FFF',
-    fontSize: 18,
-    fontWeight: 'bold',
+    color: theme.colors.textPrimary,
+    fontSize: theme.typography.fontSizeLg,
+    fontWeight: theme.typography.fontWeightBold,
   },
   brandTitle: {
-    color: '#FFF',
-    fontSize: 18,
-    fontWeight: 'bold',
+    color: theme.colors.textPrimary,
+    fontSize: theme.typography.fontSizeLg,
+    fontWeight: theme.typography.fontWeightBold,
     marginLeft: 15,
   },
   menuList: {
@@ -132,11 +129,10 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 10,
     borderRadius: 8,
-    marginBottom: 8,
+    marginBottom: theme.spacing.sm,
   },
   activeNavItem: {
-    //backgroundColor: '#3B82F6', old nav
-    backgroundColor: '#38BDF8',
+    backgroundColor: theme.colors.primary,
   },
   navIcon: {
     fontSize: 20,
@@ -144,17 +140,17 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   navText: {
-    color: '#CBD5E1',
-    fontSize: 15,
-    fontWeight: '500',
+    color: theme.colors.textMuted,
+    fontSize: theme.typography.fontSizeMd,
+    fontWeight: theme.typography.fontWeightNormal,
     marginLeft: 12,
   },
   activeNavText: {
-    color: '#FFF',
-    fontWeight: '700',
+    color: theme.colors.textPrimary,
+    fontWeight: theme.typography.fontWeightBold,
   },
   contentArea: {
     flex: 1,
-    backgroundColor: '#180227',
+    backgroundColor: theme.colors.background,
   },
 });
