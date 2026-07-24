@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <Package
   xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
   xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
@@ -41,6 +40,15 @@
       </uap:VisualElements>
     </Application>
   </Applications>
+
+  <Extensions>
+    <Extension Category="windows.activatableClass.inProcessServer">
+      <InProcessServer>
+        <Path>RNSVG.dll</Path>
+        <ActivatableClass ActivatableClassId="RNSVG.ReactPackageProvider" ThreadingModel="both" />
+      </InProcessServer>
+    </Extension>
+  </Extensions>
 
   <Capabilities>
     <Capability Name="internetClient" />

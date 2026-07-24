@@ -1,45 +1,56 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
+import React, { useState } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import MainLayout from './MainLayout';
+import Dashboard from './Dashboard';
+import LedgerScreen from './ledgerScreen';
 
-import { NewAppScreen } from '@react-native/new-app-screen';
-import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
-import {
-  SafeAreaProvider,
-  useSafeAreaInsets,
-} from 'react-native-safe-area-context';
-
-function App() {
-  const isDarkMode = useColorScheme() === 'dark';
-
+// Placeholder screen for future modules
+function PlaceholderScreen({ title }: { title: string }) {
   return (
-    <SafeAreaProvider>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <AppContent />
-    </SafeAreaProvider>
-  );
-}
-
-function AppContent() {
-  const safeAreaInsets = useSafeAreaInsets();
-
-  return (
-    <View style={styles.container}>
-      <NewAppScreen
-        templateFileName="App.tsx"
-        safeAreaInsets={safeAreaInsets}
-      />
+    <View style={styles.placeholderContainer}>
+      <Text style={styles.placeholderText}>{title} Module Under Construction 🧪</Text>
     </View>
   );
 }
 
+export default function App() {
+  const [activeScreen, setActiveScreen] = useState('dashboard');
+
+  const renderScreen = () => {
+    switch (activeScreen) {
+      case 'dashboard':
+        return <Dashboard />;
+      case 'prices':
+        return <PlaceholderScreen title="Price / Unit (Material Manager)" />;
+      case 'formulas':
+        return <PlaceholderScreen title="Formula Cookbook" />;
+      case 'production':
+        return <PlaceholderScreen title="Production Calculator" />;
+      case 'inventory':
+        return <PlaceholderScreen title="Inventory Control" />;
+      case 'ledger':
+        return <LedgerScreen />;
+      default:
+        return <Dashboard />;
+    }
+  };
+
+  return (
+    <MainLayout activeScreen={activeScreen} onNavigate={setActiveScreen}>
+      {renderScreen()}
+    </MainLayout>
+  );
+}
+
 const styles = StyleSheet.create({
-  container: {
+  placeholderContainer: {
     flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  placeholderText: {
+    fontSize: 18,
+    color: '#64748B',
+    fontWeight: '600',
   },
 });
-
-export default App;

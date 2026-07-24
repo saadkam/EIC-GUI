@@ -1,5 +1,6 @@
 const {getDefaultConfig, mergeConfig} = require('@react-native/metro-config');
 
+
 const fs = require('fs');
 const path = require('node:path');
 
@@ -19,6 +20,10 @@ const rnwPath = fs.realpathSync(
 const config = {
   //
   resolver: {
+    extraNodeModules: {
+      // Aliases the old native module to the pure JS SVG package
+      'react-native-linear-gradient': require.resolve('react-native-linear-gradient-web'),
+    },
     blockList: [
       // This stops "npx @react-native-community/cli run-windows" from causing the metro server to crash if its already running
       new RegExp(

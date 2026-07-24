@@ -75,4 +75,17 @@
     <Error Condition="!Exists('$(ReactNativeWindowsDir)\PropertySheets\External\Microsoft.ReactNative.Composition.Package.props')" Text="$([System.String]::Format('$(ErrorText)', '$(ReactNativeWindowsDir)\PropertySheets\External\Microsoft.ReactNative.Composition.Package.props'))" />
     <Error Condition="!Exists('$(ReactNativeWindowsDir)\PropertySheets\External\Microsoft.ReactNative.Composition.Package.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(ReactNativeWindowsDir)\PropertySheets\External\Microsoft.ReactNative.Composition.Package.targets'))" />
   </Target>
+  <ItemGroup>
+    <ProjectReference Include="..\EIC\EIC.vcxproj">
+      <SkipGetTargetFrameworkProperties>True</SkipGetTargetFrameworkProperties>
+    </ProjectReference>
+    
+    <ProjectReference Include="..\..\node_modules\react-native-svg\windows\RNSVG\RNSVG.vcxproj">
+      <Project>{7e9193f7-23ef-4625-99be-73df9da76be0}</Project>
+      <Name>RNSVG</Name>
+      <OutputGroupsLayoutDir></OutputGroupsLayoutDir>
+      <Private>True</Private>
+      <LinkMetadata>true</LinkMetadata>
+    </ProjectReference>
+  </ItemGroup>
 </Project>

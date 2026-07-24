@@ -1,0 +1,13 @@
+diff --git a/node_modules/react-native-svg/windows/RNSVG/RNSVG.vcxproj b/node_modules/react-native-svg/windows/RNSVG/RNSVG.vcxproj
+index b887e97..93078c6 100644
+--- a/node_modules/react-native-svg/windows/RNSVG/RNSVG.vcxproj
++++ b/node_modules/react-native-svg/windows/RNSVG/RNSVG.vcxproj
+@@ -76,7 +76,7 @@
+   <PropertyGroup Label="Configuration">
+     <ConfigurationType>DynamicLibrary</ConfigurationType>
+     <CharacterSet>Unicode</CharacterSet>
+-    <PlatformToolset>v143</PlatformToolset>
++    <PlatformToolset>v145</PlatformToolset>
+     <GenerateManifest>false</GenerateManifest>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)'=='Debug'" Label="Configuration">
