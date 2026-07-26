@@ -6,7 +6,7 @@ import { INITIAL_TRANSACTIONS } from './data/mockLedgerData';
 import { LedgerKPICards } from './components/LedgerKPICards';
 import { LedgerFilterBar } from './components/LedgerFilterBar';
 import { LedgerTable } from './components/LedgerTable';
-import { AddTransactionModal } from './components/AddTransactionModal';
+import { AddTransactionModal } from './components/AddTransactionModel';
 
 export default function LedgerScreen() {
   const [transactions, setTransactions] = useState<LedgerEntry[]>(INITIAL_TRANSACTIONS);

@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import MainLayout from './MainLayout';
-import Dashboard from './Dashboard';
-import LedgerScreen from './ledgerScreen';
+import MainLayout from './src/components/MainLayout';
+import Dashboard from './src/features/dashboard/DashnoardScreen';
+import LedgerScreen from './src/features/ledger/ledgerScreen';
 
+// TODO: Remove
 // Placeholder screen for future modules
 function PlaceholderScreen({ title }: { title: string }) {
   return (

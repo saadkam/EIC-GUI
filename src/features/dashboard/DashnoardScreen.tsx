@@ -1,10 +1,11 @@
 import React from 'react';
 import { StyleSheet, View, Text, Dimensions, ScrollView } from 'react-native';
 import { LineChart } from 'react-native-gifted-charts';
+import { theme } from '../../theme/theme';
 
 const { width } = Dimensions.get('window');
 
-export default function Dashboard() {
+export default function DashboardScreen() {
   const salesData = [
     { value: 1200, label: 'Jan' },
     { value: 1900, label: 'Feb' },
@@ -25,33 +26,39 @@ export default function Dashboard() {
 
   return (
     <ScrollView contentContainerStyle={styles.mainContent}>
+      {/* HEADER */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Finance & Operations Overview</Text>
       </View>
 
-      {/* Quick Stats Grid */}
+      {/* QUICK STATS GRID */}
       <View style={styles.statsContainer}>
-        <View style={[styles.card, { borderLeftColor: '#4CAF50', borderLeftWidth: 5 }]}>
+        <View style={[styles.card, { borderLeftColor: theme.colors.accentGreen, borderLeftWidth: 4 }]}>
           <Text style={styles.cardLabel}>Total Sales</Text>
-          <Text style={[styles.cardValue, { color: '#4CAF50' }]}>Rs.12,100</Text>
+          <Text style={[styles.cardValue, { color: theme.colors.accentGreen }]}>
+            Rs. 12,100
+          </Text>
         </View>
-        <View style={[styles.card, { borderLeftColor: '#F44336', borderLeftWidth: 5 }]}>
+
+        <View style={[styles.card, { borderLeftColor: theme.colors.accentPink, borderLeftWidth: 4 }]}>
           <Text style={styles.cardLabel}>Expenses</Text>
-          <Text style={[styles.cardValue, { color: '#F44336' }]}>Rs.8,700</Text>
+          <Text style={[styles.cardValue, { color: theme.colors.accentPink }]}>
+            Rs. 8,700
+          </Text>
         </View>
       </View>
 
-      {/* --- GRAPH CONTAINER --- */}
+      {/* GRAPH CONTAINER */}
       <View style={styles.graphCard}>
         <Text style={styles.graphTitle}>Financial Overview (Sales vs. Expenses)</Text>
 
         <View style={styles.legendContainer}>
           <View style={styles.legendItem}>
-            <View style={[styles.legendIndicator, { backgroundColor: '#4CAF50' }]} />
+            <View style={[styles.legendIndicator, { backgroundColor: theme.colors.accentGreen }]} />
             <Text style={styles.legendText}>Sales</Text>
           </View>
           <View style={styles.legendItem}>
-            <View style={[styles.legendIndicator, { backgroundColor: '#F44336' }]} />
+            <View style={[styles.legendIndicator, { backgroundColor: theme.colors.accentPink }]} />
             <Text style={styles.legendText}>Expenditure</Text>
           </View>
         </View>
@@ -61,18 +68,18 @@ export default function Dashboard() {
             data={salesData}
             data2={expensesData}
             height={220}
-            width={width - 160} // Adjusted width to fit desktop split-view
+            width={width - 180}
             spacing={45}
             initialSpacing={15}
-            color1="#4CAF50"
-            color2="#F44336"
+            color1={theme.colors.accentGreen}
+            color2={theme.colors.accentPink}
             thickness={3}
-            dataPointsColor1="#388E3C"
-            dataPointsColor2="#D32F2F"
-            yAxisColor="#ccc"
-            xAxisColor="#ccc"
-            yAxisTextStyle={{ color: '#666', fontSize: 10 }}
-            xAxisLabelTextStyle={{ color: '#666', fontSize: 10 }}
+            dataPointsColor1={theme.colors.accentGreen}
+            dataPointsColor2={theme.colors.accentPink}
+            yAxisColor={theme.colors.surfaceBorder}
+            xAxisColor={theme.colors.surfaceBorder}
+            yAxisTextStyle={{ color: theme.colors.textSecondary, fontSize: 10 }}
+            xAxisLabelTextStyle={{ color: theme.colors.textSecondary, fontSize: 10 }}
             noOfSections={4}
             isAnimated
             animateOnDataChange
@@ -87,18 +94,20 @@ export default function Dashboard() {
 const styles = StyleSheet.create({
   mainContent: {
     paddingBottom: 40,
+    backgroundColor: theme.colors.background,
+    flexGrow: 1,
   },
   header: {
     paddingHorizontal: 20,
     paddingVertical: 18,
-    backgroundColor: '#1e1e20',
+    backgroundColor: theme.colors.surfaceHeader,
     borderBottomWidth: 1,
-    borderBottomColor: '#E2E8F0',
+    borderBottomColor: theme.colors.surfaceBorder,
   },
   headerTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#eaedf3',
+    color: theme.colors.textPrimary,
   },
   statsContainer: {
     flexDirection: 'row',
@@ -109,14 +118,15 @@ const styles = StyleSheet.create({
   },
   card: {
     flex: 1,
-    backgroundColor: '#050518',
+    backgroundColor: theme.colors.surface,
     padding: 15,
     borderRadius: 8,
-    elevation: 2,
+    borderWidth: 1,
+    borderColor: theme.colors.surfaceBorder,
   },
   cardLabel: {
     fontSize: 12,
-    color: '#64748B',
+    color: theme.colors.textSecondary,
     marginBottom: 5,
     textTransform: 'uppercase',
     fontWeight: '600',
@@ -126,17 +136,18 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   graphCard: {
-    backgroundColor: '#050518',
+    backgroundColor: theme.colors.surface,
     marginHorizontal: 20,
     marginTop: 25,
     padding: 20,
     borderRadius: 12,
-    elevation: 2,
+    borderWidth: 1,
+    borderColor: theme.colors.surfaceBorder,
   },
   graphTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#1E293B',
+    color: theme.colors.textPrimary,
     marginBottom: 10,
   },
   legendContainer: {
@@ -156,10 +167,11 @@ const styles = StyleSheet.create({
   },
   legendText: {
     fontSize: 12,
-    color: '#64748B',
+    color: theme.colors.textSecondary,
     fontWeight: '500',
   },
   chartWrapper: {
     alignItems: 'center',
+    marginLeft: -10,
   },
 });
