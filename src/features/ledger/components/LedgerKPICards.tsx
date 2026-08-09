@@ -13,21 +13,21 @@ export const LedgerKPICards: React.FC<Props> = ({ summary }) => {
       <View style={[styles.kpiCard, { borderLeftColor: theme.colors.accentGreen }]}>
         <Text style={styles.kpiLabel}>Total Revenue</Text>
         <Text style={[styles.kpiValue, { color: theme.colors.accentGreen }]}>
-          +${summary.income.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+          +${summary.income.toLocaleString('en-PK', { minimumFractionDigits: 2 })}
         </Text>
       </View>
 
       <View style={[styles.kpiCard, { borderLeftColor: theme.colors.accentPink }]}>
         <Text style={styles.kpiLabel}>Total Expenses</Text>
         <Text style={[styles.kpiValue, { color: theme.colors.accentPink }]}>
-          -${summary.expense.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+          -${summary.expense.toLocaleString('en-PK', { minimumFractionDigits: 2 })}
         </Text>
       </View>
 
       <View style={[styles.kpiCard, { borderLeftColor: summary.balance >= 0 ? theme.colors.accentBlue : theme.colors.accentPink }]}>
         <Text style={styles.kpiLabel}>Net Balance</Text>
         <Text style={[styles.kpiValue, { color: summary.balance >= 0 ? theme.colors.accentBlue : theme.colors.accentPink }]}>
-          ${summary.balance.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+          ${summary.balance.toLocaleString('en-PK', { minimumFractionDigits: 2 })}
         </Text>
       </View>
     </View>

@@ -72,6 +72,11 @@ _Use_decl_annotations_ int CALLBACK WinMain(HINSTANCE instance, HINSTANCE, PSTR 
   auto appWindow{reactNativeWin32App.AppWindow()};
   appWindow.Title(L"EIC");
   appWindow.Resize({1000, 1000});
+  // Cast the presenter to an OverlappedPresenter and call Maximize
+  if (auto presenter = appWindow.Presenter().try_as<winrt::Microsoft::UI::Windowing::OverlappedPresenter>())
+  {
+      presenter.Maximize();
+  }
 
   // Get the ReactViewOptions so we can set the initial RN component to load
   auto viewOptions{reactNativeWin32App.ReactViewOptions()};

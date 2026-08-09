@@ -13,6 +13,12 @@ export default function DashboardScreen() {
     { value: 2400, label: 'Apr' },
     { value: 2100, label: 'May' },
     { value: 3000, label: 'Jun' },
+    { value: 2500, label: 'Jul' },
+    { value: 0, label: 'Aug' },
+    { value: 0, label: 'Sep' },
+    { value: 0, label: 'Oct' },
+    { value: 0, label: 'Nov' },
+    { value: 0, label: 'Dec' },
   ];
 
   const expensesData = [
@@ -22,6 +28,12 @@ export default function DashboardScreen() {
     { value: 1800, label: 'Apr' },
     { value: 1600, label: 'May' },
     { value: 2000, label: 'Jun' },
+    { value: 2500, label: 'Jul' },
+    { value: 0, label: 'Aug' },
+    { value: 0, label: 'Sep' },
+    { value: 0, label: 'Oct' },
+    { value: 0, label: 'Nov' },
+    { value: 0, label: 'Dec' },
   ];
 
   return (
@@ -69,8 +81,8 @@ export default function DashboardScreen() {
             data2={expensesData}
             height={220}
             width={width - 180}
-            spacing={45}
-            initialSpacing={15}
+            spacing={width/18}
+            initialSpacing={40}
             color1={theme.colors.accentGreen}
             color2={theme.colors.accentPink}
             thickness={3}
@@ -172,6 +184,7 @@ const styles = StyleSheet.create({
   },
   chartWrapper: {
     alignItems: 'center',
-    marginLeft: -10,
+    marginLeft: 0,
+    overflow: 'hidden',
   },
 });
