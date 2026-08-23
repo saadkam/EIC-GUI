@@ -6,7 +6,7 @@ import {
   TextInput,
   FlatList,
   TouchableOpacity,
-  Modal,
+  Pressable,
 } from 'react-native';
 import { LedgerEntry } from '../../../types/ledger';
 import { theme } from '../../../theme/theme';
@@ -24,12 +24,12 @@ export const LedgerTable: React.FC<Props> = ({ transactions, onAddTransaction })
   const [category, setCategory] = useState('');
   const [amount, setAmount] = useState('');
 
-  // Pure-JS date picker state
+  // Dropdown Flyout State
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
 
-  // Input Sanitization
+  // Input Sanitization (Numbers & Single Decimal)
   const handleAmountChange = (text: string) => {
     const sanitized = text.replace(/[^0-9.]/g, '');
     if ((sanitized.match(/\./g) || []).length <= 1) {
@@ -57,6 +57,7 @@ export const LedgerTable: React.FC<Props> = ({ transactions, onAddTransaction })
     setDescription('');
     setCategory('');
     setAmount('');
+    setIsDatePickerOpen(false);
   };
 
   // Calendar Helpers
@@ -102,19 +103,81 @@ export const LedgerTable: React.FC<Props> = ({ transactions, onAddTransaction })
 
       {/* 2. INLINE ENTRY ROW */}
       <View style={styles.entryRow}>
-        {/* DATE SELECTOR */}
+        {/* DATE FIELD WITH INLINE ANCHORED DROPDOWN */}
         <View style={styles.columnWrapperDate}>
           <TouchableOpacity
             style={[styles.inlineInput, styles.datePickerButton]}
-            onPress={() => setIsDatePickerOpen(true)}
+            onPress={() => setIsDatePickerOpen(!isDatePickerOpen)}
             activeOpacity={0.8}
           >
             <Text style={styles.datePickerText}>{date}</Text>
             <Text style={styles.calendarIcon}>📅</Text>
           </TouchableOpacity>
+
+          {/* ATTACHED DROPDOWN CALENDAR */}
+          {isDatePickerOpen && (
+            <View style={styles.calendarFlyout}>
+              {/* Header with Navigation and Close Button */}
+              <View style={styles.calendarHeader}>
+                <TouchableOpacity onPress={() => changeMonth(-1)} style={styles.navButton}>
+                  <Text style={styles.navButtonText}>◀</Text>
+                </TouchableOpacity>
+
+                <Text style={styles.calendarTitle}>
+                  {monthNames[selectedMonth]} {selectedYear}
+                </Text>
+
+                <View style={styles.headerRightControls}>
+                  <TouchableOpacity onPress={() => changeMonth(1)} style={styles.navButton}>
+                    <Text style={styles.navButtonText}>▶</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => setIsDatePickerOpen(false)}
+                    style={styles.closeButton}
+                  >
+                    <Text style={styles.closeButtonText}>✕</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              {/* Weekdays Row */}
+              <View style={styles.weekdaysRow}>
+                {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((d) => (
+                  <Text key={d} style={styles.weekdayText}>
+                    {d}
+                  </Text>
+                ))}
+              </View>
+
+              {/* Days Matrix */}
+              <View style={styles.daysGrid}>
+                {Array.from({ length: firstDayOfMonth(selectedYear, selectedMonth) }).map((_, i) => (
+                  <View key={`empty-${i}`} style={styles.dayCell} />
+                ))}
+                {Array.from({ length: daysInMonth(selectedYear, selectedMonth) }).map((_, i) => {
+                  const day = i + 1;
+                  const formattedM = String(selectedMonth + 1).padStart(2, '0');
+                  const formattedD = String(day).padStart(2, '0');
+                  const isSelected = date === `${selectedYear}-${formattedM}-${formattedD}`;
+
+                  return (
+                    <TouchableOpacity
+                      key={day}
+                      style={[styles.dayCell, isSelected && styles.selectedDayCell]}
+                      onPress={() => handleSelectDay(day)}
+                    >
+                      <Text style={[styles.dayText, isSelected && styles.selectedDayText]}>
+                        {day}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            </View>
+          )}
         </View>
 
-        {/* MULTI-LINE DESCRIPTION */}
+        {/* MULTI-LINE DESCRIPTION FIELD */}
         <View style={styles.columnWrapperDescription}>
           <TextInput
             style={[styles.inlineInput, styles.multilineInput]}
@@ -127,7 +190,7 @@ export const LedgerTable: React.FC<Props> = ({ transactions, onAddTransaction })
           />
         </View>
 
-        {/* MULTI-LINE CATEGORY */}
+        {/* MULTI-LINE CATEGORY FIELD */}
         <View style={styles.columnWrapperCategory}>
           <TextInput
             style={[styles.inlineInput, styles.multilineInput]}
@@ -140,7 +203,7 @@ export const LedgerTable: React.FC<Props> = ({ transactions, onAddTransaction })
           />
         </View>
 
-        {/* AMOUNT (LEFT ALIGNED WITH EXTRA INTERNAL PADDING) */}
+        {/* AMOUNT FIELD */}
         <View style={styles.columnWrapperAmount}>
           <TextInput
             style={[styles.inlineInput, styles.amountInput]}
@@ -203,66 +266,6 @@ export const LedgerTable: React.FC<Props> = ({ transactions, onAddTransaction })
           </View>
         }
       />
-
-      {/* 4. POPUP DATE PICKER MODAL */}
-      <Modal
-        visible={isDatePickerOpen}
-        transparent={true}
-        animationType="fade"
-        onRequestClose={() => setIsDatePickerOpen(false)}
-      >
-        <TouchableOpacity
-          style={styles.modalBackdrop}
-          activeOpacity={1}
-          onPress={() => setIsDatePickerOpen(false)}
-        >
-          <View style={styles.calendarContainer}>
-            <View style={styles.calendarHeader}>
-              <TouchableOpacity onPress={() => changeMonth(-1)} style={styles.navButton}>
-                <Text style={styles.navButtonText}>◀</Text>
-              </TouchableOpacity>
-              <Text style={styles.calendarTitle}>
-                {monthNames[selectedMonth]} {selectedYear}
-              </Text>
-              <TouchableOpacity onPress={() => changeMonth(1)} style={styles.navButton}>
-                <Text style={styles.navButtonText}>▶</Text>
-              </TouchableOpacity>
-            </View>
-
-            <View style={styles.weekdaysRow}>
-              {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((d) => (
-                <Text key={d} style={styles.weekdayText}>
-                  {d}
-                </Text>
-              ))}
-            </View>
-
-            <View style={styles.daysGrid}>
-              {Array.from({ length: firstDayOfMonth(selectedYear, selectedMonth) }).map((_, i) => (
-                <View key={`empty-${i}`} style={styles.dayCell} />
-              ))}
-              {Array.from({ length: daysInMonth(selectedYear, selectedMonth) }).map((_, i) => {
-                const day = i + 1;
-                const formattedM = String(selectedMonth + 1).padStart(2, '0');
-                const formattedD = String(day).padStart(2, '0');
-                const isSelected = date === `${selectedYear}-${formattedM}-${formattedD}`;
-
-                return (
-                  <TouchableOpacity
-                    key={day}
-                    style={[styles.dayCell, isSelected && styles.selectedDayCell]}
-                    onPress={() => handleSelectDay(day)}
-                  >
-                    <Text style={[styles.dayText, isSelected && styles.selectedDayText]}>
-                      {day}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-          </View>
-        </TouchableOpacity>
-      </Modal>
     </View>
   );
 };
@@ -272,9 +275,10 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.colors.surface,
     borderRadius: 10,
-    overflow: 'hidden',
+    overflow: 'visible', // Allows attached flyout dropdowns to break container bounds
     borderWidth: 1,
     borderColor: theme.colors.surfaceBorder,
+    zIndex: 1,
   },
   tableHeader: {
     flexDirection: 'row',
@@ -298,10 +302,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#1E1530',
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.primary,
+    zIndex: 100, // Keeps dropdown above the FlatList rows
   },
   columnWrapperDate: {
     flex: 1.3,
     paddingRight: 10,
+    position: 'relative',
+    zIndex: 101,
   },
   columnWrapperDescription: {
     flex: 3,
@@ -394,39 +401,60 @@ const styles = StyleSheet.create({
     color: theme.colors.textMuted,
     fontSize: 14,
   },
-  /* Modal Calendar */
-  modalBackdrop: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.65)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  calendarContainer: {
-    width: 290,
+  /* Attached Modern Flyout Dropdown */
+  calendarFlyout: {
+    position: 'absolute',
+    top: 45,
+    left: 0,
+    width: 270,
     backgroundColor: '#1E1530',
-    borderRadius: 12,
+    borderRadius: 8,
     borderWidth: 1,
     borderColor: theme.colors.primary,
-    padding: 16,
-    elevation: 10,
+    padding: 12,
+    elevation: 20,
+    zIndex: 9999,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.45,
+    shadowRadius: 12,
   },
   calendarHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 10,
+  },
+  headerRightControls: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
   calendarTitle: {
     color: '#F1F5F9',
-    fontSize: 14,
-    fontWeight: 'bold',
+    fontSize: 13,
+    fontWeight: '700',
   },
   navButton: {
-    padding: 6,
+    padding: 4,
   },
   navButtonText: {
     color: theme.colors.accentPurple,
-    fontSize: 14,
+    fontSize: 12,
+  },
+  closeButton: {
+    marginLeft: 6,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    backgroundColor: '#12041D',
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: theme.colors.surfaceBorder,
+  },
+  closeButtonText: {
+    color: theme.colors.textMuted,
+    fontSize: 11,
+    fontWeight: 'bold',
   },
   weekdaysRow: {
     flexDirection: 'row',
@@ -445,15 +473,15 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   dayCell: {
-    width: 36,
-    height: 32,
+    width: 35,
+    height: 30,
     justifyContent: 'center',
     alignItems: 'center',
-    marginVertical: 2,
+    marginVertical: 1,
   },
   selectedDayCell: {
     backgroundColor: theme.colors.primary,
-    borderRadius: 6,
+    borderRadius: 4,
   },
   dayText: {
     color: '#F1F5F9',
