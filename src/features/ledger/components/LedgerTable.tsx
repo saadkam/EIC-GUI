@@ -6,7 +6,6 @@ import {
   TextInput,
   FlatList,
   TouchableOpacity,
-  Pressable,
 } from 'react-native';
 import { LedgerEntry } from '../../../types/ledger';
 import { theme } from '../../../theme/theme';
@@ -103,7 +102,7 @@ export const LedgerTable: React.FC<Props> = ({ transactions, onAddTransaction })
 
       {/* 2. INLINE ENTRY ROW */}
       <View style={styles.entryRow}>
-        {/* DATE FIELD WITH INLINE ANCHORED DROPDOWN */}
+        {/* DATE FIELD WITH ANCHORED DROPDOWN */}
         <View style={styles.columnWrapperDate}>
           <TouchableOpacity
             style={[styles.inlineInput, styles.datePickerButton]}
@@ -250,8 +249,8 @@ export const LedgerTable: React.FC<Props> = ({ transactions, onAddTransaction })
                   fontWeight: 'bold',
                   color:
                     item.type === 'income'
-                      ? theme.colors.accentGreen
-                      : theme.colors.accentPink,
+                      ? theme.colors.mintGlow
+                      : theme.colors.pinkGlow,
                 },
               ]}
             >
@@ -274,8 +273,8 @@ const styles = StyleSheet.create({
   gridContainer: {
     flex: 1,
     backgroundColor: theme.colors.surface,
-    borderRadius: 10,
-    overflow: 'visible', // Allows attached flyout dropdowns to break container bounds
+    borderRadius: 14,
+    overflow: 'visible', // Allows attached flyout dropdown to break container bounds
     borderWidth: 1,
     borderColor: theme.colors.surfaceBorder,
     zIndex: 1,
@@ -290,7 +289,7 @@ const styles = StyleSheet.create({
   },
   headerCell: {
     color: theme.colors.accentPurple,
-    fontSize: 13,
+    fontSize: theme.typography.fontSizeMd,
     fontWeight: '700',
     textTransform: 'uppercase',
   },
@@ -299,9 +298,9 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     paddingVertical: 12,
     paddingHorizontal: 16,
-    backgroundColor: '#1E1530',
+    backgroundColor: 'rgba(255, 255, 255, 0.02)',
     borderBottomWidth: 1,
-    borderBottomColor: theme.colors.primary,
+    borderBottomColor: theme.colors.surfaceBorder,
     zIndex: 100, // Keeps dropdown above the FlatList rows
   },
   columnWrapperDate: {
@@ -323,12 +322,12 @@ const styles = StyleSheet.create({
     paddingRight: 10,
   },
   inlineInput: {
-    backgroundColor: '#12041D',
-    color: '#F1F5F9',
-    fontSize: 13,
+    backgroundColor: theme.colors.glassInput,
+    color: theme.colors.textPrimary,
+    fontSize: theme.typography.fontSizeMd,
     paddingHorizontal: 12,
     paddingVertical: 8,
-    borderRadius: 6,
+    borderRadius: 8,
     borderWidth: 1,
     borderColor: theme.colors.surfaceBorder,
   },
@@ -339,8 +338,8 @@ const styles = StyleSheet.create({
     height: 40,
   },
   datePickerText: {
-    color: '#F1F5F9',
-    fontSize: 13,
+    color: theme.colors.textPrimary,
+    fontSize: theme.typography.fontSizeMd,
   },
   calendarIcon: {
     fontSize: 12,
@@ -357,14 +356,19 @@ const styles = StyleSheet.create({
   },
   addButton: {
     flex: 0.8,
-    backgroundColor: theme.colors.primary,
+    backgroundColor: theme.colors.cyanGlow,
     height: 40,
-    borderRadius: 6,
+    borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
+    shadowColor: theme.colors.cyanGlow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.35,
+    shadowRadius: 6,
+    elevation: 3,
   },
   addButtonText: {
-    color: '#FFF',
+    color: '#000000',
     fontSize: 12,
     fontWeight: 'bold',
   },
@@ -377,20 +381,22 @@ const styles = StyleSheet.create({
     borderBottomColor: theme.colors.rowBorder,
   },
   cellText: {
-    color: '#F1F5F9',
-    fontSize: 14,
+    color: theme.colors.textPrimary,
+    fontSize: 13,
   },
   categoryBadge: {
     flex: 2,
     backgroundColor: theme.colors.badgeBg,
     paddingHorizontal: 10,
     paddingVertical: 5,
-    borderRadius: 4,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: theme.colors.badgeBorder,
     alignSelf: 'flex-start',
     marginRight: 10,
   },
   categoryText: {
-    color: '#CBD5E1',
+    color: theme.colors.textSecondary,
     fontSize: 12,
   },
   emptyState: {
@@ -401,23 +407,23 @@ const styles = StyleSheet.create({
     color: theme.colors.textMuted,
     fontSize: 14,
   },
-  /* Attached Modern Flyout Dropdown */
+  /* Attached Modern Glass Flyout Dropdown */
   calendarFlyout: {
     position: 'absolute',
     top: 45,
     left: 0,
     width: 270,
-    backgroundColor: '#1E1530',
-    borderRadius: 8,
+    backgroundColor: '#17112B',
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: theme.colors.primary,
+    borderColor: theme.colors.cyanGlowBorder,
     padding: 12,
     elevation: 20,
     zIndex: 9999,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.45,
-    shadowRadius: 12,
+    shadowOpacity: 0.6,
+    shadowRadius: 14,
   },
   calendarHeader: {
     flexDirection: 'row',
@@ -431,7 +437,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   calendarTitle: {
-    color: '#F1F5F9',
+    color: theme.colors.textPrimary,
     fontSize: 13,
     fontWeight: '700',
   },
@@ -446,8 +452,8 @@ const styles = StyleSheet.create({
     marginLeft: 6,
     paddingHorizontal: 6,
     paddingVertical: 2,
-    backgroundColor: '#12041D',
-    borderRadius: 4,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    borderRadius: 6,
     borderWidth: 1,
     borderColor: theme.colors.surfaceBorder,
   },
@@ -480,15 +486,15 @@ const styles = StyleSheet.create({
     marginVertical: 1,
   },
   selectedDayCell: {
-    backgroundColor: theme.colors.primary,
-    borderRadius: 4,
+    backgroundColor: theme.colors.cyanGlow,
+    borderRadius: 6,
   },
   dayText: {
-    color: '#F1F5F9',
+    color: theme.colors.textPrimary,
     fontSize: 12,
   },
   selectedDayText: {
-    color: '#FFF',
+    color: '#000000',
     fontWeight: 'bold',
   },
 });

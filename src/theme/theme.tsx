@@ -1,46 +1,59 @@
-// src/theme/theme.ts
-
 export const theme = {
   colors: {
-    // Backgrounds
-    background: '#180227',    // Deep violet main screen background
-    surface: '#220B38',       // Slightly lifted card/panel surface
-    sidebarBg: '#1E293B',     // Dark slate sidebar background
-    sidebarBorder: '#334155', // Subtle divider color
-    
-    // Accents & Interactive
-    primary: '#38BDF8',       // Sky blue active state
-    primaryHover: '#334155',  // Darker slate for icon background
-    textPrimary: '#FFFFFF',
-    textMuted: '#CBD5E1',
-    
-    // Status colors
-    success: '#00F5A0',       // Neon mint green for positive metrics/sales
-    danger: '#FF2E93',        // Magenta for expenses/alerts
+    // Canvas & Aura Background
+    background: '#0B0813',
+    auraViolet: 'rgba(99, 102, 241, 0.15)',
+    auraMint: 'rgba(16, 185, 129, 0.12)',
+    auraCyan: 'rgba(56, 189, 248, 0.12)',
 
-    surfaceHeader: '#2E0F4B',
-    surfaceBorder: '#3B1754',
-    rowBorder: '#2C0E43',
-    textSecondary: '#94A3B8',
-    accentGreen: '#00F5A0',
-    accentPink: '#FF2E93',
-    accentBlue: '#38BDF8',
+    // Translucent Glass Surfaces & Cards
+    surface: 'rgba(255, 255, 255, 0.04)',
+    surfaceHeader: 'rgba(255, 255, 255, 0.03)',
+    surfaceBorder: 'rgba(255, 255, 255, 0.08)',
+    rowBorder: 'rgba(255, 255, 255, 0.04)',
+    glassInput: 'rgba(20, 15, 38, 0.75)',
+
+    // Aura Accent Glows
+    mintGlow: '#10B981',
+    mintGlowBorder: 'rgba(16, 185, 129, 0.5)',
+    pinkGlow: '#F43F5E',
+    pinkGlowBorder: 'rgba(244, 63, 94, 0.5)',
+    cyanGlow: '#06B6D4',
+    cyanGlowBorder: 'rgba(6, 182, 212, 0.5)',
+
+    // Brand Accents
+    primary: '#06B6D4',
+    accentGreen: '#10B981',
+    accentPink: '#F43F5E',
     accentPurple: '#A78BFA',
-    badgeBg: '#33124D',
-    cancelBg: '#334155',
+
+    // Text & Badges
+    textPrimary: '#FFFFFF',
+    textSecondary: 'rgba(255, 255, 255, 0.75)',
+    textMuted: 'rgba(255, 255, 255, 0.45)',
+    badgeBg: 'rgba(255, 255, 255, 0.06)',
+    badgeBorder: 'rgba(255, 255, 255, 0.12)',
+
+    // Shell / Navigation
+    sidebarBg: 'rgba(15, 12, 29, 0.75)',
+    sidebarBorder: 'rgba(255, 255, 255, 0.08)',
   },
   spacing: {
     xs: 4,
     sm: 8,
-    md: 12,
-    lg: 16,
+    md: 14,
+    lg: 20,
     xl: 24,
   },
   typography: {
-    fontSizeSm: 12,
-    fontSizeMd: 15,
-    fontSizeLg: 18,
-    fontWeightNormal: '500' as const,
-    fontWeightBold: '700' as const,
-  }
+    fontSizeSm: 11,
+    fontSizeMd: 13,
+    fontSizeLg: 16,
+    fontSizeXl: 22,
+    fontWeightNormal: '400',
+    fontWeightMedium: '500',
+    fontWeightBold: '700',
+  },
 };
+
+export type Theme = typeof theme;
