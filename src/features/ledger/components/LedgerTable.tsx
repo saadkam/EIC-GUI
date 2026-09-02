@@ -23,12 +23,12 @@ export const LedgerTable: React.FC<Props> = ({ transactions, onAddTransaction })
   const [category, setCategory] = useState('');
   const [amount, setAmount] = useState('');
 
-  // Dropdown Flyout State
+  // Dropdown Calendar State
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
 
-  // Input Sanitization (Numbers & Single Decimal)
+  // Input Sanitization (Allows unlimited digits and 1 decimal point)
   const handleAmountChange = (text: string) => {
     const sanitized = text.replace(/[^0-9.]/g, '');
     if ((sanitized.match(/\./g) || []).length <= 1) {
@@ -93,16 +93,16 @@ export const LedgerTable: React.FC<Props> = ({ transactions, onAddTransaction })
     <View style={styles.gridContainer}>
       {/* 1. TABLE HEADER */}
       <View style={styles.tableHeader}>
-        <Text style={[styles.headerCell, { flex: 1.3 }]}>Date</Text>
-        <Text style={[styles.headerCell, { flex: 3 }]}>Description</Text>
-        <Text style={[styles.headerCell, { flex: 2 }]}>Category</Text>
-        <Text style={[styles.headerCell, { flex: 1.6, textAlign: 'left' }]}>Amount</Text>
-        <Text style={[styles.headerCell, { flex: 0.8, textAlign: 'center' }]}>Action</Text>
+        <Text style={[styles.headerCell, { flex: 1.3 }]}>DATE</Text>
+        <Text style={[styles.headerCell, { flex: 3.2 }]}>DESCRIPTION</Text>
+        <Text style={[styles.headerCell, { flex: 2 }]}>CATEGORY</Text>
+        <Text style={[styles.headerCell, { flex: 1.6, textAlign: 'left' }]}>AMOUNT</Text>
+        <Text style={[styles.headerCell, { flex: 0.8, textAlign: 'center' }]}>ACTION</Text>
       </View>
 
       {/* 2. INLINE ENTRY ROW */}
       <View style={styles.entryRow}>
-        {/* DATE FIELD WITH ANCHORED DROPDOWN */}
+        {/* DATE SELECTOR WITH FLYOUT */}
         <View style={styles.columnWrapperDate}>
           <TouchableOpacity
             style={[styles.inlineInput, styles.datePickerButton]}
@@ -113,10 +113,9 @@ export const LedgerTable: React.FC<Props> = ({ transactions, onAddTransaction })
             <Text style={styles.calendarIcon}>📅</Text>
           </TouchableOpacity>
 
-          {/* ATTACHED DROPDOWN CALENDAR */}
+          {/* FLYOUT CALENDAR DROPDOWN */}
           {isDatePickerOpen && (
             <View style={styles.calendarFlyout}>
-              {/* Header with Navigation and Close Button */}
               <View style={styles.calendarHeader}>
                 <TouchableOpacity onPress={() => changeMonth(-1)} style={styles.navButton}>
                   <Text style={styles.navButtonText}>◀</Text>
@@ -139,7 +138,6 @@ export const LedgerTable: React.FC<Props> = ({ transactions, onAddTransaction })
                 </View>
               </View>
 
-              {/* Weekdays Row */}
               <View style={styles.weekdaysRow}>
                 {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((d) => (
                   <Text key={d} style={styles.weekdayText}>
@@ -148,7 +146,6 @@ export const LedgerTable: React.FC<Props> = ({ transactions, onAddTransaction })
                 ))}
               </View>
 
-              {/* Days Matrix */}
               <View style={styles.daysGrid}>
                 {Array.from({ length: firstDayOfMonth(selectedYear, selectedMonth) }).map((_, i) => (
                   <View key={`empty-${i}`} style={styles.dayCell} />
@@ -176,7 +173,7 @@ export const LedgerTable: React.FC<Props> = ({ transactions, onAddTransaction })
           )}
         </View>
 
-        {/* MULTI-LINE DESCRIPTION FIELD */}
+        {/* MULTI-LINE DESCRIPTION */}
         <View style={styles.columnWrapperDescription}>
           <TextInput
             style={[styles.inlineInput, styles.multilineInput]}
@@ -189,7 +186,7 @@ export const LedgerTable: React.FC<Props> = ({ transactions, onAddTransaction })
           />
         </View>
 
-        {/* MULTI-LINE CATEGORY FIELD */}
+        {/* MULTI-LINE CATEGORY */}
         <View style={styles.columnWrapperCategory}>
           <TextInput
             style={[styles.inlineInput, styles.multilineInput]}
@@ -202,13 +199,13 @@ export const LedgerTable: React.FC<Props> = ({ transactions, onAddTransaction })
           />
         </View>
 
-        {/* AMOUNT FIELD */}
+        {/* UNCONSTRAINED AMOUNT INPUT */}
         <View style={styles.columnWrapperAmount}>
           <TextInput
             style={[styles.inlineInput, styles.amountInput]}
             placeholder="0.00"
             placeholderTextColor={theme.colors.textMuted}
-            keyboardType="decimal-pad"
+            keyboardType="numeric"
             value={amount}
             onChangeText={handleAmountChange}
             onSubmitEditing={handleAddRow}
@@ -217,7 +214,7 @@ export const LedgerTable: React.FC<Props> = ({ transactions, onAddTransaction })
           />
         </View>
 
-        {/* ADD ACTION BUTTON */}
+        {/* ACTION ADD BUTTON */}
         <TouchableOpacity style={styles.addButton} onPress={handleAddRow}>
           <Text style={styles.addButtonText}>+ Add</Text>
         </TouchableOpacity>
@@ -232,11 +229,13 @@ export const LedgerTable: React.FC<Props> = ({ transactions, onAddTransaction })
             <Text style={[styles.cellText, { flex: 1.3, color: theme.colors.textSecondary }]}>
               {item.date}
             </Text>
-            <Text style={[styles.cellText, { flex: 3, fontWeight: '600', paddingRight: 10 }]}>
+            <Text style={[styles.cellText, { flex: 3.2, fontWeight: '600', paddingRight: 8 }]}>
               {item.description}
             </Text>
-            <View style={styles.categoryBadge}>
-              <Text style={styles.categoryText}>{item.category}</Text>
+            <View style={styles.categoryBadgeWrapper}>
+              <View style={styles.categoryBadge}>
+                <Text style={styles.categoryText}>{item.category}</Text>
+              </View>
             </View>
             <Text
               style={[
@@ -245,12 +244,12 @@ export const LedgerTable: React.FC<Props> = ({ transactions, onAddTransaction })
                   flex: 1.6,
                   textAlign: 'left',
                   paddingLeft: 4,
-                  paddingRight: 10,
                   fontWeight: 'bold',
+                  fontVariant: ['tabular-nums'],
                   color:
                     item.type === 'income'
-                      ? theme.colors.mintGlow
-                      : theme.colors.pinkGlow,
+                      ? theme.colors.accentGreen
+                      : theme.colors.accentPink,
                 },
               ]}
             >
@@ -274,7 +273,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.colors.surface,
     borderRadius: 14,
-    overflow: 'visible', // Allows attached flyout dropdown to break container bounds
+    overflow: 'visible',
     borderWidth: 1,
     borderColor: theme.colors.surfaceBorder,
     zIndex: 1,
@@ -291,7 +290,7 @@ const styles = StyleSheet.create({
     color: theme.colors.accentPurple,
     fontSize: theme.typography.fontSizeMd,
     fontWeight: '700',
-    textTransform: 'uppercase',
+    letterSpacing: 0.6,
   },
   entryRow: {
     flexDirection: 'row',
@@ -301,35 +300,36 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.02)',
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.surfaceBorder,
-    zIndex: 100, // Keeps dropdown above the FlatList rows
+    zIndex: 100,
   },
   columnWrapperDate: {
     flex: 1.3,
-    paddingRight: 10,
+    marginRight: 8,
     position: 'relative',
     zIndex: 101,
   },
   columnWrapperDescription: {
-    flex: 3,
-    paddingRight: 10,
+    flex: 3.2,
+    marginRight: 8,
   },
   columnWrapperCategory: {
     flex: 2,
-    paddingRight: 10,
+    marginRight: 8,
   },
   columnWrapperAmount: {
     flex: 1.6,
-    paddingRight: 10,
+    marginRight: 8,
   },
   inlineInput: {
     backgroundColor: theme.colors.glassInput,
     color: theme.colors.textPrimary,
     fontSize: theme.typography.fontSizeMd,
-    paddingHorizontal: 12,
+    paddingHorizontal: 10,
     paddingVertical: 8,
     borderRadius: 8,
     borderWidth: 1,
     borderColor: theme.colors.surfaceBorder,
+    width: '100%',
   },
   datePickerButton: {
     flexDirection: 'row',
@@ -346,13 +346,12 @@ const styles = StyleSheet.create({
   },
   multilineInput: {
     minHeight: 40,
-    maxHeight: 90,
+    paddingTop: 8,
+    paddingBottom: 8,
   },
   amountInput: {
     textAlign: 'left',
     height: 40,
-    paddingLeft: 12,
-    paddingRight: 12,
   },
   addButton: {
     flex: 0.8,
@@ -384,8 +383,11 @@ const styles = StyleSheet.create({
     color: theme.colors.textPrimary,
     fontSize: 13,
   },
-  categoryBadge: {
+  categoryBadgeWrapper: {
     flex: 2,
+    paddingRight: 8,
+  },
+  categoryBadge: {
     backgroundColor: theme.colors.badgeBg,
     paddingHorizontal: 10,
     paddingVertical: 5,
@@ -393,7 +395,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: theme.colors.badgeBorder,
     alignSelf: 'flex-start',
-    marginRight: 10,
   },
   categoryText: {
     color: theme.colors.textSecondary,
@@ -407,13 +408,12 @@ const styles = StyleSheet.create({
     color: theme.colors.textMuted,
     fontSize: 14,
   },
-  /* Attached Modern Glass Flyout Dropdown */
   calendarFlyout: {
     position: 'absolute',
     top: 45,
     left: 0,
     width: 270,
-    backgroundColor: '#17112B',
+    backgroundColor: '#160E2E',
     borderRadius: 12,
     borderWidth: 1,
     borderColor: theme.colors.cyanGlowBorder,

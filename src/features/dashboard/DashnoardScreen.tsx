@@ -106,7 +106,7 @@ export default function DashboardScreen() {
 const styles = StyleSheet.create({
   mainContent: {
     paddingBottom: 40,
-    backgroundColor: theme.colors.background,
+    backgroundColor: 'transparent',
     flexGrow: 1,
   },
   header: {

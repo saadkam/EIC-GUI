@@ -1,3 +1,4 @@
+import { AppBackground } from '../components/common/AppBackground';
 import React from 'react';
 import { StyleSheet, View, SafeAreaView } from 'react-native';
 import { Sidebar } from './layout/Sidebar';
@@ -6,19 +7,23 @@ import { theme } from '../theme/theme';
 
 export default function MainLayout({ children, activeScreen, onNavigate }: MainLayoutProps) {
   return (
+    <AppBackground>
     <SafeAreaView style={styles.container}>
-      <View style={styles.shell}>
-        <Sidebar activeScreen={activeScreen} onNavigate={onNavigate} />
-        <View style={styles.contentArea}>{children}</View>
-      </View>
-    </SafeAreaView>
+        <View style={styles.shell}>
+          <Sidebar activeScreen={activeScreen} onNavigate={onNavigate} />
+          <View style={styles.contentArea}>{children}</View>
+        </View>
+      </SafeAreaView>
+    </AppBackground>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.background,
+    backgroundColor: 'transparent', // Ensure container does not block the JPEG image
+    padding: 0,
+    
   },
   shell: {
     flex: 1,
@@ -26,6 +31,6 @@ const styles = StyleSheet.create({
   },
   contentArea: {
     flex: 1,
-    backgroundColor: theme.colors.background,
+    backgroundColor: 'transparent',
   },
 });

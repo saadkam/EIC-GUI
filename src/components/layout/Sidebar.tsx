@@ -47,9 +47,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeScreen, onNavigate }) =>
 
 const styles = StyleSheet.create({
   sidebar: {
-    backgroundColor: theme.colors.sidebarBg,
     borderRightWidth: 1,
     borderRightColor: theme.colors.sidebarBorder,
+    paddingLeft: 20,
+    marginLeft: 0,
+    backgroundColor: theme.colors.surface,
     paddingTop: 15,
     paddingHorizontal: 10,
     overflow: 'hidden',

@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { StyleSheet, View, Text, SafeAreaView } from 'react-native';
 import { LedgerEntry } from '../../types/ledger';
@@ -42,7 +43,7 @@ export default function LedgerScreen() {
     });
   }, [transactions, searchQuery, filterType]);
 
-  // Add Handler
+  // Modal Add Handler
   const handleAddTransaction = (newEntryData: Omit<LedgerEntry, 'id' | 'date'>) => {
     const newEntry: LedgerEntry = {
       ...newEntryData,
@@ -52,45 +53,62 @@ export default function LedgerScreen() {
     setTransactions([newEntry, ...transactions]);
   };
 
+  // Inline Row Add Handler
+  const handleAddInline = (entry: Omit<LedgerEntry, 'id'>) => {
+    const newEntry: LedgerEntry = {
+      ...entry,
+      id: Date.now().toString(),
+    };
+    setTransactions([newEntry, ...transactions]);
+  };
+
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.headerContainer}>
-        <Text style={styles.screenTitle}>Financial Ledger</Text>
-        <LedgerKPICards summary={summary} />
-      </View>
+   
+      <SafeAreaView style={styles.container}>
+        <View style={styles.headerContainer}>
+          <Text style={styles.screenTitle}>Financial Ledger</Text>
+          <LedgerKPICards summary={summary} />
+        </View>
 
-      <LedgerFilterBar
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        filterType={filterType}
-        onFilterChange={setFilterType}
-        onOpenAddModal={() => setIsAddModalOpen(true)}
-      />
+        <LedgerFilterBar
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          filterType={filterType}
+          onFilterChange={setFilterType}
+          onOpenAddModal={() => setIsAddModalOpen(true)}
+        />
 
-      <LedgerTable transactions={filteredTransactions} />
+        <LedgerTable
+          transactions={filteredTransactions}
+          onAddTransaction={handleAddInline}
+        />
 
-      <AddTransactionModal
-        visible={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
-        onAdd={handleAddTransaction}
-      />
-    </SafeAreaView>
+        <AddTransactionModal
+          visible={isAddModalOpen}
+          onClose={() => setIsAddModalOpen(false)}
+          onAdd={handleAddTransaction}
+        />
+      </SafeAreaView>
+  
   );
 }
+
+// Named export support
+export { LedgerScreen };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.background,
+    backgroundColor: 'transparent', // Ensure container does not block the JPEG image
     padding: 20,
   },
   headerContainer: {
-    marginBottom: 20,
+    marginBottom: 8,
   },
   screenTitle: {
     fontSize: 24,
     fontWeight: 'bold',
     color: theme.colors.textPrimary,
-    marginBottom: 15,
+    marginBottom: 16,
   },
 });

@@ -2,21 +2,31 @@ import React from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import { theme } from '../../../theme/theme';
 
+export interface LedgerSummary {
+  income: number;
+  expense: number;
+  balance: number;
+}
+
 interface Props {
+  summary?: LedgerSummary;
   totalRevenue?: number;
   totalExpenses?: number;
   netBalance?: number;
 }
 
 export const LedgerKPICards: React.FC<Props> = ({
-  totalRevenue = 0,
-  totalExpenses = 0,
-  netBalance = 0,
+  summary,
+  totalRevenue,
+  totalExpenses,
+  netBalance,
 }) => {
-  // Safe currency formatter with fallback to 0
-  const formatCurrency = (val?: number) => {
-    const num = typeof val === 'number' && !isNaN(val) ? val : 0;
-    return num.toLocaleString('en-US', {
+  const revenue = summary?.income ?? totalRevenue ?? 0;
+  const expenses = summary?.expense ?? totalExpenses ?? 0;
+  const balance = summary?.balance ?? netBalance ?? 0;
+
+  const formatCurrency = (val: number) => {
+    return Math.abs(val).toLocaleString('en-PK', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     });
@@ -25,26 +35,29 @@ export const LedgerKPICards: React.FC<Props> = ({
   return (
     <View style={styles.kpiContainer}>
       {/* TOTAL REVENUE */}
-      <View style={[styles.kpiCard, styles.revenueGlow]}>
+      <View style={[styles.kpiCard, styles.revenueCard]}>
+        <View style={styles.specularTopBorderMint} />
         <Text style={styles.kpiLabel}>TOTAL REVENUE</Text>
         <Text style={[styles.kpiValue, { color: theme.colors.mintGlow }]}>
-          +${formatCurrency(totalRevenue)}
+          + Rs.{formatCurrency(revenue)}
         </Text>
       </View>
 
       {/* TOTAL EXPENSES */}
-      <View style={[styles.kpiCard, styles.expenseGlow]}>
+      <View style={[styles.kpiCard, styles.expenseCard]}>
+        <View style={styles.specularTopBorderPink} />
         <Text style={styles.kpiLabel}>TOTAL EXPENSES</Text>
         <Text style={[styles.kpiValue, { color: theme.colors.pinkGlow }]}>
-          -${formatCurrency(Math.abs(totalExpenses || 0))}
+          - Rs.{formatCurrency(expenses)}
         </Text>
       </View>
 
       {/* NET BALANCE */}
-      <View style={[styles.kpiCard, styles.balanceGlow]}>
+      <View style={[styles.kpiCard, styles.balanceCard]}>
+        <View style={styles.specularTopBorderCyan} />
         <Text style={styles.kpiLabel}>NET BALANCE</Text>
         <Text style={[styles.kpiValue, { color: theme.colors.cyanGlow }]}>
-          ${formatCurrency(netBalance)}
+          Rs.{formatCurrency(balance)}
         </Text>
       </View>
     </View>
@@ -55,39 +68,65 @@ const styles = StyleSheet.create({
   kpiContainer: {
     flexDirection: 'row',
     gap: 16,
-    marginBottom: 20,
+    marginBottom: 16,
   },
   kpiCard: {
     flex: 1,
-    backgroundColor: theme.colors.surface,
+    backgroundColor: 'transparent',
     borderRadius: 14,
-    paddingVertical: 16,
+    paddingVertical: 18,
     paddingHorizontal: 20,
     borderWidth: 1,
+    position: 'relative',
+    overflow: 'hidden',
   },
-  revenueGlow: {
+  revenueCard: {
     borderColor: theme.colors.mintGlowBorder,
-    shadowColor: theme.colors.mintGlow,
+    shadowColor: theme.colors.mintGlowGlass,
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.25,
-    shadowRadius: 12,
-    elevation: 4,
+    shadowOpacity: 0.35,
+    shadowRadius: 14,
   },
-  expenseGlow: {
+  expenseCard: {
     borderColor: theme.colors.pinkGlowBorder,
-    shadowColor: theme.colors.pinkGlow,
+    shadowColor: theme.colors.pinkGlowGlass,
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.25,
-    shadowRadius: 12,
-    elevation: 4,
+    shadowOpacity: 0.35,
+    shadowRadius: 14,
   },
-  balanceGlow: {
+  balanceCard: {
     borderColor: theme.colors.cyanGlowBorder,
-    shadowColor: theme.colors.cyanGlow,
+    shadowColor: theme.colors.cyanGlowGlass,
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.25,
-    shadowRadius: 12,
-    elevation: 4,
+    shadowOpacity: 0.35,
+    shadowRadius: 14,
+  },
+  specularTopBorderMint: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 2,
+    backgroundColor: theme.colors.mintGlow,
+    opacity: 0.8,
+  },
+  specularTopBorderPink: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 2,
+    backgroundColor: theme.colors.pinkGlow,
+    opacity: 0.8,
+  },
+  specularTopBorderCyan: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 2,
+    backgroundColor: theme.colors.cyanGlow,
+    opacity: 0.8,
   },
   kpiLabel: {
     fontSize: theme.typography.fontSizeSm,

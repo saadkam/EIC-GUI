@@ -35,10 +35,10 @@ const styles = StyleSheet.create({
   navItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 0,
     borderRadius: 8,
-    marginBottom: theme.spacing.sm,
+    marginTop: theme.spacing.lg,
   },
   activeNavItem: {
     backgroundColor: theme.colors.primary,

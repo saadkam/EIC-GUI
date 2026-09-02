@@ -5,18 +5,25 @@ import { theme } from '../../../theme/theme';
 interface Props {
   searchQuery: string;
   onSearchChange: (text: string) => void;
-  selectedFilter: 'all' | 'income' | 'expense';
-  onSelectFilter: (filter: 'all' | 'income' | 'expense') => void;
+  filterType?: 'all' | 'income' | 'expense';
+  onFilterChange?: (filter: 'all' | 'income' | 'expense') => void;
+  selectedFilter?: 'all' | 'income' | 'expense';
+  onSelectFilter?: (filter: 'all' | 'income' | 'expense') => void;
   onOpenAddModal: () => void;
 }
 
 export const LedgerFilterBar: React.FC<Props> = ({
   searchQuery,
   onSearchChange,
+  filterType,
+  onFilterChange,
   selectedFilter,
   onSelectFilter,
   onOpenAddModal,
 }) => {
+  const currentFilter = filterType ?? selectedFilter ?? 'all';
+  const handleFilter = onFilterChange ?? onSelectFilter ?? (() => {});
+
   return (
     <View style={styles.barContainer}>
       <View style={styles.searchWrapper}>
@@ -31,12 +38,12 @@ export const LedgerFilterBar: React.FC<Props> = ({
 
       <View style={styles.segmentContainer}>
         {(['all', 'income', 'expense'] as const).map((filter) => {
-          const isActive = selectedFilter === filter;
+          const isActive = currentFilter === filter;
           return (
             <TouchableOpacity
               key={filter}
               style={[styles.segmentBtn, isActive && styles.segmentBtnActive]}
-              onPress={() => onSelectFilter(filter)}
+              onPress={() => handleFilter(filter)}
             >
               <Text style={[styles.segmentText, isActive && styles.segmentTextActive]}>
                 {filter.toUpperCase()}
@@ -58,7 +65,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    marginBottom: 20,
+    marginBottom: 16,
   },
   searchWrapper: {
     flex: 1,

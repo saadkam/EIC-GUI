@@ -1,4 +1,8 @@
 export const theme = {
+  assets: {
+    // Local background image asset
+    backgroundImage: require('../../src/assets/background.jpeg'),
+  },
   colors: {
     // Canvas & Aura Background
     background: '#0B0813',
@@ -15,10 +19,13 @@ export const theme = {
 
     // Aura Accent Glows
     mintGlow: '#10B981',
+    mintGlowGlass: 'rgba(16,185,129,0.7)',
     mintGlowBorder: 'rgba(16, 185, 129, 0.5)',
     pinkGlow: '#F43F5E',
+    pinkGlowGlass: 'rgba(244, 63, 94, 0.7)',
     pinkGlowBorder: 'rgba(244, 63, 94, 0.5)',
     cyanGlow: '#06B6D4',
+    cyanGlowGlass: 'rgba(6, 182, 212, 0.7)',
     cyanGlowBorder: 'rgba(6, 182, 212, 0.5)',
 
     // Brand Accents
@@ -36,9 +43,10 @@ export const theme = {
 
     // Shell / Navigation
     sidebarBg: 'rgba(15, 12, 29, 0.75)',
-    sidebarBorder: 'rgba(255, 255, 255, 0.08)',
+    sidebarBorder: 'rgba(255, 255, 255, 0.0)',
   },
   spacing: {
+    none: 0,
     xs: 4,
     sm: 8,
     md: 14,
