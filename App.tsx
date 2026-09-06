@@ -3,6 +3,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import MainLayout from './src/components/MainLayout';
 import Dashboard from './src/features/dashboard/DashnoardScreen';
 import LedgerScreen from './src/features/ledger/ledgerScreen';
+import ChallansScreen from './src/features/challans/ChallanScreen';
 
 // TODO: Remove
 // Placeholder screen for future modules
@@ -31,6 +32,8 @@ export default function App() {
         return <PlaceholderScreen title="Inventory Control" />;
       case 'ledger':
         return <LedgerScreen />;
+      case 'challan':
+        return <ChallansScreen />;
       default:
         return <Dashboard />;
     }

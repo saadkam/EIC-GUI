@@ -1,7 +1,12 @@
+import React from 'react';
+export interface IconProps {
+  size?: number;
+}
+
 export interface NavItem {
   id: string;
   title: string;
-  icon: string;
+  icon: React.ComponentType<IconProps>;
 }
 
 export interface MainLayoutProps {

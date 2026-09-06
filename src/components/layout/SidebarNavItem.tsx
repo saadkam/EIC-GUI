@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { NavItem } from '../../types/navigation';
 import { theme } from '../../theme/theme';
 
@@ -16,14 +16,25 @@ export const SidebarNavItem: React.FC<SidebarNavItemProps> = ({
   isExpanded,
   onSelect,
 }) => {
+  const IconComponent = item.icon;
   return (
     <TouchableOpacity
-      style={[styles.navItem, isActive && styles.activeNavItem]}
+      style={[
+        styles.navItem,
+        !isExpanded && styles.collapsedNavItem,
+        isActive && styles.activeNavItem,
+      ]}
       onPress={() => onSelect(item.id)}
+      activeOpacity={0.7}
     >
-      <Text style={styles.navIcon}>{item.icon}</Text>
+      <View style={styles.iconContainer}>
+        {IconComponent && <IconComponent size={27} />}
+      </View>
       {isExpanded && (
-        <Text style={[styles.navText, isActive && styles.activeNavText]}>
+        <Text
+          numberOfLines={1}
+          style={[styles.navText, isActive && styles.activeNavText]}
+        >
           {item.title}
         </Text>
       )}
@@ -35,23 +46,33 @@ const styles = StyleSheet.create({
   navItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 0,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
     borderRadius: 8,
-    marginTop: theme.spacing.lg,
+    marginBottom: 8,
+    minHeight: 44,
+  },
+  collapsedNavItem: {
+    paddingHorizontal: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
   },
   activeNavItem: {
-    backgroundColor: theme.colors.primary,
+    backgroundColor: 'rgba(6, 182, 212, 0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(6, 182, 212, 0.25)',
   },
-  navIcon: {
-    fontSize: 20,
-    width: 30,
-    textAlign: 'center',
+  iconContainer: {
+    width: 24,
+    height: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   navText: {
     color: theme.colors.textMuted,
     fontSize: theme.typography.fontSizeMd,
-    fontWeight: theme.typography.fontWeightNormal,
+    fontWeight: theme.typography.fontWeightMedium,
     marginLeft: 12,
   },
   activeNavText: {

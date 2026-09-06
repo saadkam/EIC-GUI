@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { theme } from '../../theme/theme';
-import { MenuIcon } from '../common/icons/MenuIcon';
+import { HamburgerIcon } from '../common/icons/MenuIcon';
 
 interface SidebarHeaderProps {
   isExpanded: boolean;
@@ -16,7 +16,7 @@ export const SidebarHeader: React.FC<SidebarHeaderProps> = ({ isExpanded, onTogg
         style={styles.menuIconButton}
         activeOpacity={0.7}
       >
-        <MenuIcon size={18} color={theme.colors.textPrimary} />
+        <HamburgerIcon size={25} />
       </TouchableOpacity>
       {isExpanded && <Text style={styles.brandTitle}>FormulaFlow</Text>}
     </View>
@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 25,
     marginTop: 10,
-    paddingHorizontal: 5,
+    paddingHorizontal: 0,
   },
   menuIconButton: {
     padding: theme.spacing.sm,
