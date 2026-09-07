@@ -36,6 +36,6 @@ export const NAV_ITEMS: NavItem[] = [
      },
   { id: 'delivery_challan', title: 'Delivery Challan', icon: DeliveryChallanIcon,
      },
-  
-  
+  { id: 'BusinessPartners', title: 'Businesses', icon: DeliveryChallanIcon,
+     },
 ];

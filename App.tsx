@@ -4,6 +4,8 @@ import MainLayout from './src/components/MainLayout';
 import Dashboard from './src/features/dashboard/DashnoardScreen';
 import LedgerScreen from './src/features/ledger/ledgerScreen';
 import ChallansScreen from './src/features/challans/ChallanScreen';
+import RawMaterialsScreen from './src/features/inventory/RawMaterialsScreen';
+import BusinessPartnersListScreen from './src/features/BusinessPartners/BusinessPartnersModule';
 
 // TODO: Remove
 // Placeholder screen for future modules
@@ -29,11 +31,13 @@ export default function App() {
       case 'production':
         return <PlaceholderScreen title="Production Calculator" />;
       case 'inventory':
-        return <PlaceholderScreen title="Inventory Control" />;
+        return <RawMaterialsScreen/>;
       case 'ledger':
         return <LedgerScreen />;
       case 'challan':
         return <ChallansScreen />;
+      case 'BusinessPartners':
+        return <BusinessPartnersListScreen />;
       default:
         return <Dashboard />;
     }

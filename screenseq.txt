@@ -1,0 +1,78 @@
+Based on the database schema, your frontend (Windows and Android apps) will need the following core screens, grouped by functional modules.
+
+1. Dashboard (Home)
+Overview Screen: A high-level snapshot of daily operations.
+
+Key Metrics: Active production batches, pending sales orders, low stock alerts, and unpaid invoices.
+
+Quick Actions: Start new batch, create new sales order, receive payment.
+
+2. Inventory & Catalog
+Raw Materials Screen:
+
+List View: Current stock levels, unit of measure, and cost per unit.
+
+Detail/Edit Modal: Update stock quantities, edit costs, and log manual inventory adjustments.
+
+Products Catalog Screen:
+
+List View: Finished goods and catalog items.
+
+Detail/Edit Modal: Manage product names, standard batch yields, and FBR-compliant HS Codes.
+
+3. Manufacturing & R&D
+Formula Builder Screen:
+
+List View: All active and inactive formulas/versions.
+
+Creation View: Select a target product, add raw materials, set exact quantities required, and define the sequence/order of mixing.
+
+Production Floor (Batches) Screen:
+
+List/Kanban View: Track batches by status (Pending, In Progress, Completed).
+
+Execution View: Select a formula to start a batch, log start/end times, and record the final volume produced (which should trigger an update to finished goods inventory).
+
+4. CRM & Sales Operations
+Customer Directory Screen:
+
+List View: Searchable list of clients.
+
+Profile View: Contact details, billing/shipping addresses, and Tax/NTN/GST registration numbers. History of past orders.
+
+Sales Order Management Screen:
+
+List/Kanban View: Visually track orders through your defined lifecycle (Received ➔ Manufactured ➔ Dispatched ➔ Partial Payment ➔ Paid).
+
+Order Creation: Select customer, add products, set total amount.
+
+Fulfillment & Dispatch Screen:
+
+Challan Generator: Link to a Manufactured Sales Order, input Vehicle Number and Driver Contact, and generate a Delivery Challan to mark the order as Dispatched.
+
+5. Billing & Accounts Receivable
+Invoicing Screen:
+
+List View: Invoices categorized by Unpaid, Partial Payment, and Paid.
+
+Detail View: Calculate SubTotal and Tax, view total Amount Due versus original Total Amount.
+
+Payment Reception Screen:
+
+Action Modal: Select an open invoice, log an incoming payment amount, record the method (Bank Transfer, Cheque, Cash), and note the reference number. (This automatically updates the Invoice state and Sales Order state).
+
+6. Procurement & Accounts Payable
+Purchase Orders Screen:
+
+List View: Orders placed with suppliers (Draft vs. Finalized).
+
+Detail View: Total amount, order date, and supplier details.
+
+Debit Vouchers Screen:
+
+Action Modal: Link to a Purchase Order to log outgoing payments/liabilities to suppliers.
+
+7. Financial Reporting
+General Ledger Screen:
+
+Read-Only Table: A chronological log of all financial movements (Debits and Credits) tied to their source documents (Invoices, POs, Payments). Used for auditing and exporting to accounting software.
