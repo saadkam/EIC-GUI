@@ -23,6 +23,35 @@ export const DashboardIcon: React.FC<IconProps> = ({ size = 20 }) => {
   );
 };
 
+export const CalendarDuotoneIcon: React.FC<IconProps> = ({ size = 20 }) => {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 256 256">
+      {/* Translucent Duotone Fill (Calendar Body) */}
+      <Path
+        d="M224,80V208a8,8,0,0,1-8,8H40a8,8,0,0,1-8-8V80Z"
+        fill="rgba(6, 182, 212, 0.35)"
+      />
+      {/* Primary Solid Outline (Frame & Bindings) */}
+      <Path
+        d="M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM72,48v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24V72H32V48ZM208,208H48V88H208V208Z"
+        fill="#06B6D4"
+      />
+    </Svg>
+  );
+};
+
+// Add to the bottom of your MenuIcons.tsx file
+export const PrintIcon: React.FC<IconProps> = ({ size = 20 }) => {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 256 256" fill="none">
+      <Path
+        d="M224,104H192V40a8,8,0,0,0-8-8H72a8,8,0,0,0-8,8v64H32a16,16,0,0,0-16,16v80a16,16,0,0,0,16,16H72v24a8,8,0,0,0,8,8H176a8,8,0,0,0,8-8V216h40a16,16,0,0,0,16-16V120A16,16,0,0,0,224,104ZM80,48h96V104H80Zm88,184H88V184h80Zm56-32H184V176a8,8,0,0,0-8-8H80a8,8,0,0,0-8,8v24H32V120H224v80Zm-36-44a12,12,0,1,1,12-12A12,12,0,0,1,188,156Z"
+        fill="#000000"
+      />
+    </Svg>
+  );
+};
+
 export const HamburgerIcon: React.FC<IconProps> = ({ size = 20 }) => {
   return (
     <Svg width={size} height={size} viewBox="0 0 256 256">

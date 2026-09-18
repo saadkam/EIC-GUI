@@ -18,11 +18,11 @@ CREATE TABLE BusinessPartners (
 -- ==============================================================================
 -- 2. INVENTORY & CATALOG (Unified Item Master)
 -- ==============================================================================
-
 CREATE TABLE InventoryItems (
     ItemID INT IDENTITY(1,1) PRIMARY KEY,
     SKU NVARCHAR(50) NOT NULL UNIQUE,
     ItemName NVARCHAR(255) NOT NULL,
+    ItemNameUrdu NVARCHAR(255), -- Added to support Urdu translation
     ItemType NVARCHAR(50) NOT NULL 
         CHECK (ItemType IN ('Raw Material', 'Finished Good', 'Consumable')),
     HSCode NVARCHAR(50), 

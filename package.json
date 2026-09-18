@@ -23,6 +23,7 @@
     "react-native-linear-gradient-web": "^1.2.0",
     "react-native-safe-area-context": "^5.5.2",
     "react-native-svg": "^15.15.5",
+    "react-native-unified-print": "^0.1.0",
     "react-native-windows": "^0.84.0",
     "zod": "^4.4.3"
   },

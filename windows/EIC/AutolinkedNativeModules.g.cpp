@@ -6,6 +6,9 @@
 // Includes from react-native-svg
 #include <winrt/RNSVG.h>
 
+// Includes from react-native-unified-print
+#include <winrt/ReactNativeUnifiedPrint.h>
+
 namespace winrt::Microsoft::ReactNative
 {
 
@@ -13,6 +16,8 @@ void RegisterAutolinkedNativeModulePackages(winrt::Windows::Foundation::Collecti
 { 
     // IReactPackageProviders from react-native-svg
     packageProviders.Append(winrt::RNSVG::ReactPackageProvider());
+    // IReactPackageProviders from react-native-unified-print
+    packageProviders.Append(winrt::ReactNativeUnifiedPrint::ReactPackageProvider());
 }
 
 }

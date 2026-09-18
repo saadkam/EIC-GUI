@@ -4,9 +4,10 @@ import MainLayout from './src/components/MainLayout';
 import Dashboard from './src/features/dashboard/DashnoardScreen';
 import LedgerScreen from './src/features/ledger/ledgerScreen';
 import ChallansScreen from './src/features/challans/ChallanScreen';
-import RawMaterialsScreen from './src/features/inventory/RawMaterialsScreen';
 import BusinessPartnersListScreen from './src/features/BusinessPartners/BusinessPartnersModule';
-
+import InventoryModule from './src/features/Inventory/InventoryModule';
+import ProcurementHubScreen from './src/features/procurement/procurementHubScreen';
+import CostingScreen from './src/features/costing/CostingScreen';
 // TODO: Remove
 // Placeholder screen for future modules
 function PlaceholderScreen({ title }: { title: string }) {
@@ -25,13 +26,13 @@ export default function App() {
       case 'dashboard':
         return <Dashboard />;
       case 'prices':
-        return <PlaceholderScreen title="Price / Unit (Material Manager)" />;
+        return <ProcurementHubScreen/>;
       case 'formulas':
-        return <PlaceholderScreen title="Formula Cookbook" />;
+        return <CostingScreen/>;
       case 'production':
         return <PlaceholderScreen title="Production Calculator" />;
       case 'inventory':
-        return <RawMaterialsScreen/>;
+        return <InventoryModule/>;
       case 'ledger':
         return <LedgerScreen />;
       case 'challan':
