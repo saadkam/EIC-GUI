@@ -72,10 +72,23 @@ export default function ProcurementHubScreen() {
   if (currentView === 'po-form') {
     return <PurchaseOrderScreen initialData={selectedItem} onBack={navigateToList} />;
   }
+  
+  // Report Designer
+  // if (currentView === 'report') {
+  //   return <ReportDesignerScreen onBack={navigateToList} />;
+  //   //return <ProcurementReportScreen data={filteredData} onBack={navigateToList} />;
+  // }
+  
   if (currentView === 'report') {
-    return <ReportDesignerScreen onBack={navigateToList} />;
-    //return <ProcurementReportScreen data={filteredData} onBack={navigateToList} />;
+    return (
+      <ProcurementReportScreen
+        data={filteredData}
+        onBack={navigateToList}
+        //reportTitle="Procurement & Payables Report"
+      />
+    );
   }
+
   // if (currentView === 'voucher-form') return <DebitVoucherScreen initialData={selectedItem} onBack={navigateToList} />;
 
   return (

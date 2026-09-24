@@ -4,7 +4,7 @@ import { StyleSheet, View, Text, TouchableOpacity, ScrollView, SafeAreaView, Tex
 import { theme } from '../../theme/theme';
 import { ProcurementEntry } from './components/ProcurementTable';
 import { PrintIcon } from '../../components/common/icons/MenuIcon';
-
+import { print } from 'react-native-unified-print';
 interface Props {
   data: ProcurementEntry[];
   onBack: () => void;
@@ -82,11 +82,11 @@ export const ProcurementReportScreen: React.FC<Props> = ({ data, onBack }) => {
       </html>
     `;
 
-    // try {
-    //   await RNPrint.print({ html: htmlContent });
-    // } catch (error) {
-    //   console.error("Failed to execute print job:", error);
-    // }
+    try {
+      await print({ html: htmlContent });
+    } catch (error) {
+      console.error("Failed to execute print job:", error);
+    }
   };
 
   const Checkbox = ({ label, value, onToggle }: { label: string, value: boolean, onToggle: () => void }) => (

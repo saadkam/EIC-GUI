@@ -7,8 +7,7 @@ import { PrintIcon } from '../../components/common/icons/MenuIcon';
 
 interface Props {
   data: FormulationItem[];
-  yieldPercentage: number;
-  actualOutputQty: number;
+  yieldWeight: number;
   totalCost: number;
   totalInputQty: number;
   finalUnitCost: number;
@@ -16,10 +15,10 @@ interface Props {
 }
 
 export const CostingReportScreen: React.FC<Props> = ({ 
-  data, yieldPercentage, actualOutputQty, totalCost, totalInputQty, finalUnitCost, onBack 
+  data, yieldWeight, totalCost, totalInputQty, finalUnitCost, onBack 
 }) => {
   const [reportTitle, setReportTitle] = useState('Formulation Costing Report');
-  const [preparedBy, setPreparedBy] = useState('Admin');
+  const [preparedBy, setPreparedBy] = useState('Saad');
   
   const [showPercentages, setShowPercentages] = useState(true);
   const [showUnitPrice, setShowUnitPrice] = useState(true);
@@ -51,7 +50,7 @@ export const CostingReportScreen: React.FC<Props> = ({
         <body>
           <div class="header">
             <div>
-              <h1 class="title">NIC CHEMICALS (PVT) LTD</h1>
+              <h1 class="title" style="color: #059669;">NIC CHEMICALS (PVT) LTD</h1>
               <div class="subtitle">${reportTitle.toUpperCase()}</div>
             </div>
             <div class="meta">
@@ -88,13 +87,9 @@ export const CostingReportScreen: React.FC<Props> = ({
                 <span class="metric-label">Total Input Mass</span>
                 <span class="metric-value">${totalInputQty.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
               </div>
-              <div class="metric-row">
-                <span class="metric-label">Production Yield</span>
-                <span class="metric-value">${yieldPercentage}%</span>
-              </div>
               <div class="metric-row" style="border-top: 1px solid #E2E8F0; padding-top: 8px; margin-top: 8px;">
-                <span class="metric-label">Actual Output Mass</span>
-                <span class="metric-value">${actualOutputQty.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+                <span class="metric-label">Actual Yield (Weight)</span>
+                <span class="metric-value">${yieldWeight > 0 ? yieldWeight.toLocaleString('en-US', { minimumFractionDigits: 2 }) : totalInputQty.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
               </div>
             </div>
             <div class="metric-box" style="text-align: right;">
@@ -141,11 +136,23 @@ export const CostingReportScreen: React.FC<Props> = ({
           <Text style={styles.sidebarTitle}>Report Settings</Text>
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Document Title</Text>
-            <TextInput style={styles.input} value={reportTitle} onChangeText={setReportTitle} />
+            <TextInput 
+              style={styles.input} 
+              value={reportTitle} 
+              onChangeText={setReportTitle}
+              cursorColor={theme.colors.cyanGlow}
+              selectionColor="rgba(6, 182, 212, 0.3)" 
+            />
           </View>
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Prepared By</Text>
-            <TextInput style={styles.input} value={preparedBy} onChangeText={setPreparedBy} />
+            <TextInput 
+              style={styles.input} 
+              value={preparedBy} 
+              onChangeText={setPreparedBy}
+              cursorColor={theme.colors.cyanGlow}
+              selectionColor="rgba(6, 182, 212, 0.3)" 
+            />
           </View>
           <View style={styles.divider} />
           <Text style={styles.label}>Visible Columns</Text>
@@ -195,13 +202,11 @@ export const CostingReportScreen: React.FC<Props> = ({
                   <Text style={styles.metricLabel}>Total Input Mass</Text>
                   <Text style={styles.metricValue}>{totalInputQty.toLocaleString('en-US', { minimumFractionDigits: 2 })}</Text>
                 </View>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingBottom: 6 }}>
-                  <Text style={styles.metricLabel}>Production Yield</Text>
-                  <Text style={styles.metricValue}>{yieldPercentage}%</Text>
-                </View>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingTop: 6, borderTopWidth: 1, borderTopColor: '#E2E8F0' }}>
-                  <Text style={styles.metricLabel}>Actual Output Mass</Text>
-                  <Text style={styles.metricValue}>{actualOutputQty.toLocaleString('en-US', { minimumFractionDigits: 2 })}</Text>
+                  <Text style={styles.metricLabel}>Actual Yield (Weight)</Text>
+                  <Text style={styles.metricValue}>
+                    {yieldWeight > 0 ? yieldWeight.toLocaleString('en-US', { minimumFractionDigits: 2 }) : totalInputQty.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                  </Text>
                 </View>
               </View>
               <View style={[styles.metricBlock, { alignItems: 'flex-end', justifyContent: 'center' }]}>
@@ -241,7 +246,7 @@ const styles = StyleSheet.create({
   previewContent: { padding: 40, alignItems: 'center' },
   a4Page: { width: 800, minHeight: 1131, backgroundColor: '#FFFFFF', padding: 48, shadowColor: '#000', shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.5, shadowRadius: 20 },
   docHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', borderBottomWidth: 2, borderBottomColor: '#1E293B', paddingBottom: 24, marginBottom: 32 },
-  companyName: { color: '#0F172A', fontSize: 24, fontWeight: '900', letterSpacing: 1 },
+  companyName: { color: '#059669', fontSize: 24, fontWeight: '900', letterSpacing: 1 },
   docTitle: { color: '#475569', fontSize: 16, fontWeight: '700', paddingTop: 4 },
   metaText: { color: '#334155', fontSize: 13, fontWeight: '500', paddingBottom: 4 },
   table: { width: '100%', borderTopWidth: 1, borderTopColor: '#CBD5E1' },
