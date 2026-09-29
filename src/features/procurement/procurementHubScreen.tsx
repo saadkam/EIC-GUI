@@ -8,6 +8,7 @@ import { ReportDesignerScreen } from '../reports/ReportDesignerScreen';
 // Full-Screen Views
 import { PurchaseOrderScreen } from './PurchaseOrderScreen';
 import { ProcurementReportScreen } from './ProcurementReportScreen';
+import { PurchaseOrderPrintScreen } from './PurchaseOrderPrintScreen';
 // import { DebitVoucherScreen } from './DebitVoucherScreen';
 
 const MOCK_DATA: ProcurementEntry[] = [
@@ -20,13 +21,14 @@ const MOCK_DATA: ProcurementEntry[] = [
 type ProcurementTab = 'All' | 'Purchase Orders' | 'Debit Vouchers';
 const PROCUREMENT_TABS = ['All', 'Purchase Orders', 'Debit Vouchers'] as const;
 
-type ViewState = 'list' | 'po-form' | 'voucher-form' | 'report';
+type ViewState = 'list' | 'po-form' | 'voucher-form' | 'report' | 'po-print';
 
 export default function ProcurementHubScreen() {
-  // Local Screen Router
   const [currentView, setCurrentView] = useState<ViewState>('list');
   const [selectedItem, setSelectedItem] = useState<ProcurementEntry | null>(null);
 
+  const [poPrintData, setPoPrintData] = useState<any>(null);
+  
   // Filter States
   const [activeTab, setActiveTab] = useState<ProcurementTab>('All');
   const [searchQuery, setSearchQuery] = useState('');
@@ -68,23 +70,44 @@ export default function ProcurementHubScreen() {
     setSelectedItem(null);
   };
 
-  // Sub-Screen View Switcher
-  if (currentView === 'po-form') {
-    return <PurchaseOrderScreen initialData={selectedItem} onBack={navigateToList} />;
-  }
-  
+  // Catch the payload and trigger the print screen
+  const handlePOIssued = (payload: any) => {
+    setPoPrintData(payload);
+    setCurrentView('po-print');
+  };
+
+  // Sub-Screen View Switcher  
   // Report Designer
   // if (currentView === 'report') {
   //   return <ReportDesignerScreen onBack={navigateToList} />;
   //   //return <ProcurementReportScreen data={filteredData} onBack={navigateToList} />;
   // }
+
+  if (currentView === 'po-form') {
+    return (
+      <PurchaseOrderScreen 
+        initialData={selectedItem} 
+        onBack={navigateToList} 
+        onPOIssued={handlePOIssued} // Pass the handoff function here
+      />
+    );
+  }
+  
+  // The new Print Engine router
+  if (currentView === 'po-print' && poPrintData) {
+    return (
+      <PurchaseOrderPrintScreen 
+        poData={poPrintData} 
+        onBackToHub={navigateToList} 
+      />
+    );
+  }
   
   if (currentView === 'report') {
     return (
       <ProcurementReportScreen
         data={filteredData}
         onBack={navigateToList}
-        //reportTitle="Procurement & Payables Report"
       />
     );
   }
