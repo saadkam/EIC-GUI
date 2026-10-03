@@ -4,17 +4,17 @@ import { theme } from '../../../theme/theme';
 
 interface Props {
   pendingPOs: number;
-  totalPayables: number;
-  vouchersCleared: number;
+  issuedPOs: number;
+  totalPendingAmmount: number;
 }
 
 export const ProcurementKPICards: React.FC<Props> = ({
   pendingPOs,
-  totalPayables,
-  vouchersCleared,
+  issuedPOs,
+  totalPendingAmmount,
 }) => {
   const formatCurrency = (val: number) => {
-    return val.toLocaleString('en-US', {
+    return Math.abs(val).toLocaleString('en-IN', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     });
@@ -22,25 +22,30 @@ export const ProcurementKPICards: React.FC<Props> = ({
 
   return (
     <View style={styles.kpiContainer}>
-      <View style={[styles.kpiCard, styles.cyanCard]}>
+      {/* PENDING POs (CYAN GLOW) */}
+      <View style={[styles.kpiCard, styles.issuedCard]}>
+        <View style={styles.specularTopBorderMint} />
+        <Text style={styles.kpiLabel}>Issued POs</Text>
+        <Text style={[styles.kpiValue, { color: '#34D399' }]}>
+          {issuedPOs}
+        </Text>
+      </View>
+
+      {/* FINALIZED POs (MINT GLOW) */}
+      <View style={[styles.kpiCard, styles.pendingCard]}>
         <View style={styles.specularTopBorderCyan} />
-        <Text style={styles.kpiLabel}>PENDING POs</Text>
-        <Text style={[styles.kpiValue, { color: theme.colors.cyanGlow }]}>
+        <Text style={styles.kpiLabel}>Pending POs</Text>
+        <Text style={[styles.kpiValue, { color: '#38BDF8' }]}>
           {pendingPOs}
         </Text>
       </View>
-      <View style={[styles.kpiCard, styles.pinkCard]}>
+
+      {/* TOTAL PO VALUE (ROSE / PINK GLOW) */}
+      <View style={[styles.kpiCard, styles.valueCard]}>
         <View style={styles.specularTopBorderPink} />
-        <Text style={styles.kpiLabel}>TOTAL PAYABLES</Text>
-        <Text style={[styles.kpiValue, { color: theme.colors.pinkGlow }]}>
-          Rs. {formatCurrency(totalPayables)}
-        </Text>
-      </View>
-      <View style={[styles.kpiCard, styles.mintCard]}>
-        <View style={styles.specularTopBorderMint} />
-        <Text style={styles.kpiLabel}>VOUCHERS CLEARED</Text>
-        <Text style={[styles.kpiValue, { color: theme.colors.mintGlow }]}>
-          {vouchersCleared}
+        <Text style={styles.kpiLabel}>TOTAL PENDING PO</Text>
+        <Text style={[styles.kpiValue, { color: '#FB7185' }]}>
+          Rs. {formatCurrency(totalPendingAmmount)}
         </Text>
       </View>
     </View>
@@ -51,38 +56,38 @@ const styles = StyleSheet.create({
   kpiContainer: {
     flexDirection: 'row',
     gap: 16,
-    marginBottom: 20,
+    marginBottom: 22,
   },
   kpiCard: {
     flex: 1,
-    backgroundColor: theme.colors.surface,
+    backgroundColor: 'rgba(255, 255, 255, 0.035)',
     borderRadius: 14,
     paddingVertical: 18,
-    paddingHorizontal: 20,
+    paddingHorizontal: 22,
     borderWidth: 1,
     position: 'relative',
     overflow: 'hidden',
   },
-  cyanCard: {
-    borderColor: theme.colors.cyanGlowBorder,
-    shadowColor: theme.colors.cyanGlow,
+  pendingCard: {
+    borderColor: 'rgba(56, 189, 248, 0.45)',
+    shadowColor: '#06B6D4',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.25,
-    shadowRadius: 14,
+    shadowOpacity: 0.35,
+    shadowRadius: 16,
   },
-  pinkCard: {
-    borderColor: theme.colors.pinkGlowBorder,
-    shadowColor: theme.colors.pinkGlow,
+  issuedCard: {
+    borderColor: 'rgba(52, 211, 153, 0.45)',
+    shadowColor: '#10B981',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.25,
-    shadowRadius: 14,
+    shadowOpacity: 0.35,
+    shadowRadius: 16,
   },
-  mintCard: {
-    borderColor: theme.colors.mintGlowBorder,
-    shadowColor: theme.colors.mintGlow,
+  valueCard: {
+    borderColor: 'rgba(251, 113, 133, 0.45)',
+    shadowColor: '#F43F5E',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.25,
-    shadowRadius: 14,
+    shadowOpacity: 0.35,
+    shadowRadius: 16,
   },
   specularTopBorderCyan: {
     position: 'absolute',
@@ -90,16 +95,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: 2,
-    backgroundColor: theme.colors.cyanGlow,
-    opacity: 0.8,
-  },
-  specularTopBorderPink: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 2,
-    backgroundColor: theme.colors.pinkGlow,
+    backgroundColor: '#7DD3FC',
     opacity: 0.8,
   },
   specularTopBorderMint: {
@@ -108,18 +104,27 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: 2,
-    backgroundColor: theme.colors.mintGlow,
+    backgroundColor: '#6EE7B7',
+    opacity: 0.8,
+  },
+  specularTopBorderPink: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 2,
+    backgroundColor: '#FDA4AF',
     opacity: 0.8,
   },
   kpiLabel: {
-    fontSize: theme.typography.fontSizeSm,
+    fontSize: 11,
     fontWeight: '700',
-    color: theme.colors.textMuted,
-    letterSpacing: 0.8,
-    marginBottom: 6,
+    color: 'rgba(255, 255, 255, 0.55)',
+    letterSpacing: 1.1,
+    marginBottom: 8,
   },
   kpiValue: {
-    fontSize: theme.typography.fontSizeXl,
+    fontSize: 24,
     fontWeight: 'bold',
     fontVariant: ['tabular-nums'],
   },

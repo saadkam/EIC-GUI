@@ -11,7 +11,7 @@ import {
   OrderCartIcon,
   InvoiceIcon} 
   from '../components/common/icons/MenuIcon';
-
+import { CompanyLogoIcon } from '../assets/CompanyLogo';
 export const NAV_ITEMS: NavItem[] = [
   { 
     id: 'dashboard', 

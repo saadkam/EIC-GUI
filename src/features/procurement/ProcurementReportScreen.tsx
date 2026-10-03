@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, ScrollView, SafeAreaView, TextInput } from 'react-native';
-// import RNPrint from 'react-native-print';
 import { theme } from '../../theme/theme';
 import { ProcurementEntry } from './components/ProcurementTable';
 import { PrintIcon } from '../../components/common/icons/MenuIcon';
 import { print } from 'react-native-unified-print';
+import { CompanyLogoIcon, RAW_COMPANY_LOGO_SVG } from '../../assets/CompanyLogo'; 
+
 interface Props {
   data: ProcurementEntry[];
   onBack: () => void;
@@ -27,22 +28,37 @@ export const ProcurementReportScreen: React.FC<Props> = ({ data, onBack }) => {
       <html>
         <head>
           <style>
-            body { font-family: 'Segoe UI', Arial, sans-serif; padding: 40px; color: #0F172A; }
-            .header { border-bottom: 2px solid #1E293B; padding-bottom: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; }
-            .title { font-size: 24px; font-weight: 900; margin: 0; }
-            .subtitle { font-size: 16px; font-weight: 700; color: #475569; margin-top: 5px; }
-            .meta { text-align: right; font-size: 13px; color: #334155; }
+            body { font-family: 'Segoe UI', Arial, sans-serif; padding: 40px; color: #0F172A; max-width: 900px; margin: 0 auto; }
+            .header { border-bottom: 2px solid #1E293B; padding-bottom: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-start; }
+            
+            /* Logo & Brand Flex Layout */
+            .title-section { display: flex; flex-direction: column; }
+            .brand-row { display: flex; align-items: center; margin-bottom: 8px; }
+            .logo-container { width: 50px; height: 50px; margin-right: 16px; }
+            .logo-container svg { width: 100%; height: 100%; display: block; }
+            
+            .title { font-size: 24px; font-weight: 900; margin: 0; color: #0F172A; }
+            .subtitle { font-size: 16px; font-weight: 700; color: #000066; margin-top: 5px; letter-spacing: 1px; }
+            .meta { text-align: right; font-size: 13px; color: #334155; line-height: 1.6; }
+            
             table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
-            th { background-color: #F1F5F9; border-bottom: 2px solid #94A3B8; text-align: left; padding: 12px 8px; font-size: 12px; }
-            td { border-bottom: 1px solid #E2E8F0; padding: 12px 8px; font-size: 13px; }
+            /* Added brand colors to the table header */
+            th { background-color: #ecfff0; border-bottom: 2px solid #00C853; text-align: left; padding: 12px 8px; font-size: 12px; color: #00C853; text-transform: uppercase; }
+            td { border-bottom: 1px solid #e2f0e7; padding: 12px 8px; font-size: 13px; }
             .right { text-align: right; }
             .footer { border-top: 2px solid #1E293B; padding-top: 16px; text-align: right; font-size: 20px; font-weight: 900; }
+            .footer-value { color: #00C853; }
           </style>
         </head>
         <body>
           <div class="header">
-            <div>
-              <h1 class="title">NIC CHEMICALS (PVT) LTD</h1>
+            <div class="title-section">
+              <div class="brand-row">
+                <div class="logo-container">
+                  ${RAW_COMPANY_LOGO_SVG}
+                </div>
+                <h1 class="title">NIC CHEMICALS (PVT) LTD</h1>
+              </div>
               <div class="subtitle">${reportTitle.toUpperCase()}</div>
             </div>
             <div class="meta">
@@ -64,11 +80,9 @@ export const ProcurementReportScreen: React.FC<Props> = ({ data, onBack }) => {
             <tbody>
               ${data.map(item => `
                 <tr>
-                  <td><b>${item.id}</b></td>
-                  ${showDate ? `<td>${item.date}</td>` : ''}
+                  <td><b>${item.id}</b></td>${showDate ? `<td>${item.date}</td>` : ''}
                   ${showVendor ? `<td>${item.vendor}</td>` : ''}
-                  <td>${item.type}</td>
-                  ${showStatus ? `<td>${item.status}</td>` : ''}
+                  <td>${item.type}</td>${showStatus ? `<td>${item.status}</td>` : ''}
                   <td class="right">${item.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
                 </tr>
               `).join('')}
@@ -76,7 +90,7 @@ export const ProcurementReportScreen: React.FC<Props> = ({ data, onBack }) => {
           </table>
           <div class="footer">
             <span style="font-size: 14px; color: #475569; margin-right: 15px;">Total Amount:</span>
-            Rs. ${totalAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+            <span class="footer-value">Rs. ${totalAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
           </div>
         </body>
       </html>
@@ -105,7 +119,6 @@ export const ProcurementReportScreen: React.FC<Props> = ({ data, onBack }) => {
           <Text style={styles.backBtnText}>← Back to List</Text>
         </TouchableOpacity>
         
-        {/* Print Button utilizing the custom SVG instead of Emoji */}
         <TouchableOpacity onPress={triggerPrint} style={styles.printBtn}>
           <PrintIcon size={16} />
           <Text style={styles.printBtnText}>Print Document</Text>
@@ -132,9 +145,13 @@ export const ProcurementReportScreen: React.FC<Props> = ({ data, onBack }) => {
 
         <ScrollView style={styles.previewArea} contentContainerStyle={styles.previewContent}>
           <View style={styles.a4Page}>
+            
             <View style={styles.docHeader}>
               <View>
-                <Text style={styles.companyName}>NIC CHEMICALS (PVT) LTD</Text>
+                <View style={styles.brandRow}>
+                  <CompanyLogoIcon size={50} />
+                  <Text style={styles.companyName}>NIC CHEMICALS (PVT) LTD</Text>
+                </View>
                 <Text style={styles.docTitle}>{reportTitle.toUpperCase()}</Text>
               </View>
               <View style={{ alignItems: 'flex-end' }}>
@@ -182,8 +199,6 @@ const styles = StyleSheet.create({
   navBar: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, backgroundColor: theme.colors.surfaceHeader, borderBottomWidth: 1, borderBottomColor: theme.colors.surfaceBorder },
   backBtn: { paddingVertical: 8, paddingHorizontal: 16, backgroundColor: theme.colors.surface, borderRadius: 8, borderWidth: 1, borderColor: theme.colors.surfaceBorder },
   backBtnText: { color: theme.colors.textPrimary, fontSize: 14, fontWeight: '600' },
-  
-  // Updated Print Button Styles
   printBtn: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: theme.colors.cyanGlow, paddingVertical: 10, paddingHorizontal: 20, borderRadius: 8 },
   printBtnText: { color: '#000', fontWeight: 'bold', fontSize: 14 },
   
@@ -199,19 +214,27 @@ const styles = StyleSheet.create({
   checkboxActive: { backgroundColor: theme.colors.cyanGlow, borderColor: theme.colors.cyanGlow },
   checkMark: { color: '#000', fontSize: 12, fontWeight: 'bold' },
   checkboxLabel: { color: theme.colors.textPrimary, fontSize: 14 },
+  
   previewArea: { flex: 1 },
   previewContent: { padding: 40, alignItems: 'center' },
   a4Page: { width: 800, minHeight: 1131, backgroundColor: '#FFFFFF', padding: 48, shadowColor: '#000', shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.5, shadowRadius: 20 },
+  
   docHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', borderBottomWidth: 2, borderBottomColor: '#1E293B', paddingBottom: 24, marginBottom: 32 },
-  companyName: { color: '#0F172A', fontSize: 24, fontWeight: '900', letterSpacing: 1 },
-  docTitle: { color: '#475569', fontSize: 16, fontWeight: '700', marginTop: 4 },
+  
+  // Brand Header Styles
+  brandRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
+  companyName: { color: '#0F172A', fontSize: 24, fontWeight: '900', letterSpacing: 1, marginLeft: 16 },
+  docTitle: { color: '#000066', fontSize: 16, fontWeight: '700', marginTop: 4, letterSpacing: 1 },
   metaText: { color: '#334155', fontSize: 13, fontWeight: '500', marginBottom: 4 },
+  
   table: { width: '100%', borderTopWidth: 1, borderTopColor: '#CBD5E1' },
-  tableHeaderRow: { flexDirection: 'row', backgroundColor: '#F1F5F9', paddingVertical: 12, paddingHorizontal: 8, borderBottomWidth: 2, borderBottomColor: '#94A3B8' },
-  th: { color: '#1E293B', fontSize: 11, fontWeight: '800', letterSpacing: 0.5 },
-  tableDataRow: { flexDirection: 'row', paddingVertical: 12, paddingHorizontal: 8, borderBottomWidth: 1, borderBottomColor: '#E2E8F0' },
+  // Styled Table Header
+  tableHeaderRow: { flexDirection: 'row', backgroundColor: '#ecfff0', paddingVertical: 12, paddingHorizontal: 8, borderBottomWidth: 2, borderBottomColor: '#00C853' },
+  th: { color: '#00C853', fontSize: 11, fontWeight: '800', letterSpacing: 0.5 },
+  tableDataRow: { flexDirection: 'row', paddingVertical: 12, paddingHorizontal: 8, borderBottomWidth: 1, borderBottomColor: '#f0e2e2' },
   td: { color: '#334155', fontSize: 12 },
+  
   docFooter: { flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', marginTop: 32, paddingTop: 16, borderTopWidth: 2, borderTopColor: '#1E293B' },
   footerTotalLabel: { color: '#475569', fontSize: 14, fontWeight: '700', marginRight: 16 },
-  footerTotalValue: { color: '#0F172A', fontSize: 20, fontWeight: '900', fontVariant: ['tabular-nums'] },
+  footerTotalValue: { color: '#00C853', fontSize: 20, fontWeight: '900', fontVariant: ['tabular-nums'] },
 });

@@ -3,6 +3,7 @@ import { StyleSheet, View, Text, TouchableOpacity, ScrollView, SafeAreaView, Tex
 import { theme } from '../../theme/theme';
 import { PrintIcon } from '../../components/common/icons/MenuIcon';
 import { print } from 'react-native-unified-print';
+import { CompanyLogoIcon, RAW_COMPANY_LOGO_SVG } from '../../assets/CompanyLogo';
 
 interface POPrintProps {
   poData: any; // The payload passed from the form after server success
@@ -14,6 +15,7 @@ export const PurchaseOrderPrintScreen: React.FC<POPrintProps> = ({ poData, onBac
   const [preparedBy, setPreparedBy] = useState('Admin');
   const [showDescription, setShowDescription] = useState(false);
   const [showUser, setShowUser] = useState(false);
+  const [showStatus, setShowStatus] = useState(true);
   const [showUninvoiced, setShowUninvoiced] = useState(true);
   
   const printDate = new Date().toISOString().split('T')[0];
@@ -22,14 +24,23 @@ export const PurchaseOrderPrintScreen: React.FC<POPrintProps> = ({ poData, onBac
     const formattedCompanyAddress = "NIC Chemicals<br/>Plot 111 Sector 27<br/>Korangi industrial area<br/>Karachi Sindh Pakistan, 75400";
     const formattedVendorAddress = poData.vendor?.replace(/\n/g, '<br/>') || 'N/A';
 
+    const rawLogoSvg = RAW_COMPANY_LOGO_SVG;
+
     const htmlContent = `
       <html>
         <head>
           <style>
             body { font-family: 'Segoe UI', Arial, sans-serif; padding: 40px; color: #0F172A; max-width: 800px; margin: 0 auto; }
-            .header { border-bottom: 2px solid #1E293B; padding-bottom: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; }
+            .header { border-bottom: 2px solid #1E293B; padding-bottom: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-start; }
+            .title-section { display: flex; flex-direction: column; }
+            
+            /* Logo & Brand Flex Layout */
+            .brand-row { display: flex; align-items: center; margin-bottom: 8px; }
+            .logo-container { width: 60px; height: 60px; margin-right: 16px; }
+            .logo-container svg { width: 100%; height: 100%; display: block; }
+            
             .title { font-size: 24px; font-weight: 900; margin: 0; }
-            .subtitle { font-size: 16px; font-weight: 700; color: #475569; margin-top: 5px; }
+            .subtitle { font-size: 16px; font-weight: 700; color: #475569; margin-top: 10px; letter-spacing: 1px; }
             .meta { text-align: right; font-size: 13px; color: #334155; line-height: 1.6; }
             .address-block { display: flex; justify-content: space-between; margin-bottom: 30px; font-size: 13px; line-height: 1.5; }
             .address-col { width: 45%; }
@@ -41,38 +52,36 @@ export const PurchaseOrderPrintScreen: React.FC<POPrintProps> = ({ poData, onBac
             .footer { border-top: 2px solid #1E293B; padding-top: 16px; text-align: right; font-size: 20px; font-weight: 900; }
             .notes { margin-top: 40px; padding-top: 20px; border-top: 1px dashed #CBD5E1; font-size: 12px; color: #64748B; }
             
-            /* Simple text label */
-            .uninvoiced-text { text-align: left; margin-top: 30px; font-size: 13px; font-weight: 700; color: #0f172a; letter-spacing: 1px; }
+            /* Bottom Labels Container */
+            .bottom-labels { margin-top: 30px; text-align: left; }
+            .status-text { font-size: 13px; font-weight: 700; color: #0f172a; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; }
+            .uninvoiced-text { font-size: 13px; font-weight: 700; color: #0f172a; letter-spacing: 1px; }
+            
             @media print {
-              .uninvoiced-text {
-                text-align: left;
-                font-size: 13px;
-                font-weight: 700;
-                color: #0f172a;
-                letter-spacing: 1px;
-                
-                /* Anchoring properties */
+              .bottom-labels {
                 position: fixed;
-                bottom: 0; /* Pushes it to the very bottom */
+                bottom: 0;
                 left: 0;
-                width: 100%; /* Ensures it spans the page width for alignment */
-                
-                /* Note: Removed margin-bottom: 5vh; as bottom: 0; handles the placement, 
-                  but you can use bottom: 1cm; if you need a specific margin from the paper edge */
+                width: 100%;
               }
             }
           </style>
         </head>
         <body>
           <div class="header">
-            <div>
-              <h1 class="title">NIC CHEMICALS (PVT) LTD</h1>
+            <div class="title-section">
+              <div class="brand-row">
+                <div class="logo-container">
+                  ${rawLogoSvg}
+                </div>
+                <h1 class="title">NIC CHEMICALS (PVT) LTD</h1>
+              </div>
               <div class="subtitle">${documentTitle.toUpperCase()}</div>
             </div>
             <div class="meta">
               <div>Date: ${printDate}</div>
               <div>PO Ref: ${poData.id}</div>
-              <div>${showUser ? `Prepared By: ${preparedBy}`:''}</div>
+              ${showUser ? `<div>Prepared By: ${preparedBy}</div>` : ''}
             </div>
           </div>
           
@@ -115,7 +124,10 @@ export const PurchaseOrderPrintScreen: React.FC<POPrintProps> = ({ poData, onBac
 
           ${(showDescription && poData.description) ? `<div class="notes"><strong>Description / Notes:</strong><br/>${poData.description.replace(/\n/g, '<br/>')}</div>` : ''}
           
-          ${(!poData.invoiced && showUninvoiced) ? `<div class="uninvoiced-text">UNINVOICED</div>` : ''}
+          <div class="bottom-labels">
+            ${showStatus ? `<div class="status-text">STATUS: ${poData.status}</div>` : ''}
+            ${(!poData.invoiced && showUninvoiced) ? `<div class="uninvoiced-text">UNINVOICED</div>` : ''}
+          </div>
         </body>
       </html>
     `;
@@ -165,6 +177,7 @@ export const PurchaseOrderPrintScreen: React.FC<POPrintProps> = ({ poData, onBac
           <Text style={styles.label}>Visible Sections</Text>
           <Checkbox label="Show Notes/Description" value={showDescription} onToggle={() => setShowDescription(!showDescription)} />
           <Checkbox label="Show User" value={showUser} onToggle={() => setShowUser(!showUser)} />
+          <Checkbox label="Show Status" value={showStatus} onToggle={() => setShowStatus(!showStatus)} />
           
           {!poData.invoiced && (
             <Checkbox label="Show 'Uninvoiced' Label" value={showUninvoiced} onToggle={() => setShowUninvoiced(!showUninvoiced)} />
@@ -177,7 +190,10 @@ export const PurchaseOrderPrintScreen: React.FC<POPrintProps> = ({ poData, onBac
             
             <View style={styles.docHeader}>
               <View>
-                <Text style={styles.companyName}>NIC CHEMICALS (PVT) LTD</Text>
+                <View style={styles.brandRow}>
+                  <CompanyLogoIcon size={60} />
+                  <Text style={styles.companyName}>NIC CHEMICALS (PVT) LTD</Text>
+                </View>
                 <Text style={styles.docTitle}>{documentTitle.toUpperCase()}</Text>
               </View>
               <View style={{ alignItems: 'flex-end' }}>
@@ -237,10 +253,14 @@ export const PurchaseOrderPrintScreen: React.FC<POPrintProps> = ({ poData, onBac
               </View>
             ) : null}
 
-            {/* Render the Uninvoiced label aligned to the bottom left */}
-            {(!poData.invoiced && showUninvoiced) ? (
-              <Text style={styles.uninvoicedText}>UNINVOICED</Text>
-            ) : null}
+            <View style={styles.bottomLabels}>
+              {showStatus && (
+                <Text style={styles.statusText}>STATUS: {poData.status.toUpperCase()}</Text>
+              )}
+              {(!poData.invoiced && showUninvoiced) ? (
+                <Text style={styles.uninvoicedText}>UNINVOICED</Text>
+              ) : null}
+            </View>
 
           </View>
         </ScrollView>
@@ -275,8 +295,11 @@ const styles = StyleSheet.create({
   a4Page: { width: 800, minHeight: 1131, backgroundColor: '#FFFFFF', padding: 48, shadowColor: '#000', shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.5, shadowRadius: 20 },
   
   docHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', borderBottomWidth: 2, borderBottomColor: '#1E293B', paddingBottom: 24, marginBottom: 32 },
-  companyName: { color: '#0F172A', fontSize: 24, fontWeight: '900', letterSpacing: 1 },
-  docTitle: { color: '#475569', fontSize: 16, fontWeight: '700', marginTop: 4 },
+  
+  brandRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
+  companyName: { color: '#0F172A', fontSize: 24, fontWeight: '900', letterSpacing: 1, marginLeft: 16 },
+  
+  docTitle: { color: '#475569', fontSize: 16, fontWeight: '700', marginTop: 8, letterSpacing: 1 },
   metaText: { color: '#334155', fontSize: 13, fontWeight: '500', marginBottom: 4 },
   
   addressBlock: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 32 },
@@ -296,5 +319,7 @@ const styles = StyleSheet.create({
   
   docNotes: { marginTop: 40, paddingTop: 20, borderTopWidth: 1, borderTopColor: '#E2E8F0', borderStyle: 'dashed' },
 
-  uninvoicedText: { marginTop: 30, color: '#0f172a', fontSize: 13, fontWeight: '700', letterSpacing: 1 },
+  bottomLabels: { marginTop: 30, alignItems: 'flex-start' },
+  statusText: { color: '#0f172a', fontSize: 13, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 6 },
+  uninvoicedText: { color: '#0f172a', fontSize: 13, fontWeight: '700', letterSpacing: 1 },
 });

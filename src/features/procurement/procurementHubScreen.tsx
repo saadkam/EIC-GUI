@@ -4,29 +4,28 @@ import { theme } from '../../theme/theme';
 import { ProcurementKPICards } from './components/ProcurementKPICards';
 import { ProcurementTable, ProcurementEntry } from './components/ProcurementTable';
 import { GlobalFilterBar, DateFilterType } from '../../components/common/GlobalFilterBar';
-import { ReportDesignerScreen } from '../reports/ReportDesignerScreen';
 // Full-Screen Views
 import { PurchaseOrderScreen } from './PurchaseOrderScreen';
 import { ProcurementReportScreen } from './ProcurementReportScreen';
 import { PurchaseOrderPrintScreen } from './PurchaseOrderPrintScreen';
-// import { DebitVoucherScreen } from './DebitVoucherScreen';
+import { GLOBAL_TAX_RATE } from '../../config/globals'; 
 
+// Updated Mock Data with all 4 statuses and PO-GRNI format for uninvoiced
 const MOCK_DATA: ProcurementEntry[] = [
-  { id: 'PO-1042', date: '2026-09-10', vendor: 'NIC Chemicals', type: 'Purchase Order', amount: 125000.00, status: 'Approved' },
-  { id: 'DV-089', date: '2026-08-11', vendor: 'Logistics Pro', type: 'Debit Voucher', amount: 15000.00, status: 'Paid' },
-  { id: 'PO-1043', date: '2026-07-12', vendor: 'Soya Extracts Ltd', type: 'Purchase Order', amount: 45000.00, status: 'Draft' },
-  { id: 'PO-1044', date: '2025-11-20', vendor: 'Alpha Solvents', type: 'Purchase Order', amount: 88000.00, status: 'Pending' },
+  { id: 'PO-GRNI-0042', date: '2026-09-10', vendor: 'NIC Chemicals', type: 'Purchase Order', amount: 125000.00, status: 'Issued' },
+  { id: 'PO-GRNI-0043', date: '2026-09-25', vendor: 'Logistics Pro', type: 'Purchase Order', amount: 15000.00, status: 'Approved' },
+  { id: 'PO-GRNI-0044', date: '2026-09-28', vendor: 'Alpha Solvents', type: 'Purchase Order', amount: 88000.00, status: 'Pending' },
+  { id: 'PO-1045', date: '2026-08-12', vendor: 'Soya Extracts Ltd', type: 'Purchase Order', amount: 45000.00, status: 'Finalized' },
 ];
 
-type ProcurementTab = 'All' | 'Purchase Orders' | 'Debit Vouchers';
-const PROCUREMENT_TABS = ['All', 'Purchase Orders', 'Debit Vouchers'] as const;
+type ProcurementTab = 'All' | 'Pending' | 'Finalized';
+const PROCUREMENT_TABS = ['All', 'Pending', 'Finalized'] as const;
 
-type ViewState = 'list' | 'po-form' | 'voucher-form' | 'report' | 'po-print';
+type ViewState = 'list' | 'po-form' | 'report' | 'po-print';
 
 export default function ProcurementHubScreen() {
   const [currentView, setCurrentView] = useState<ViewState>('list');
   const [selectedItem, setSelectedItem] = useState<ProcurementEntry | null>(null);
-
   const [poPrintData, setPoPrintData] = useState<any>(null);
   
   // Filter States
@@ -39,12 +38,11 @@ export default function ProcurementHubScreen() {
 
   const filteredData = useMemo(() => {
     return MOCK_DATA.filter((item) => {
-      // FIX: Map the plural tab name to the singular item.type string
-      if (activeTab !== 'All') {
-        const expectedType = activeTab === 'Purchase Orders' ? 'Purchase Order' : 'Debit Voucher';
-        if (item.type !== expectedType) return false;
-      }
+      // Tab Filtering
+      if (activeTab === 'Pending' && item.status !== 'Pending') return false;
+      if (activeTab === 'Finalized' && item.status !== 'Finalized') return false;
 
+      // Dropdown Status Filtering (All 4 Statuses)
       if (activeStatus !== 'All' && item.status !== activeStatus) return false;
       
       const query = searchQuery.toLowerCase();
@@ -59,10 +57,9 @@ export default function ProcurementHubScreen() {
     });
   }, [activeTab, searchQuery, activeStatus, startDate, endDate]);
 
-
   const handleRowPress = (item: ProcurementEntry) => {
     setSelectedItem(item);
-    setCurrentView(item.type === 'Purchase Order' ? 'po-form' : 'voucher-form');
+    setCurrentView('po-form');
   };
 
   const navigateToList = () => {
@@ -76,24 +73,18 @@ export default function ProcurementHubScreen() {
     setCurrentView('po-print');
   };
 
-  // Sub-Screen View Switcher  
-  // Report Designer
-  // if (currentView === 'report') {
-  //   return <ReportDesignerScreen onBack={navigateToList} />;
-  //   //return <ProcurementReportScreen data={filteredData} onBack={navigateToList} />;
-  // }
-
+  // Sub-Screen View Switcher
   if (currentView === 'po-form') {
     return (
       <PurchaseOrderScreen 
         initialData={selectedItem} 
         onBack={navigateToList} 
-        onPOIssued={handlePOIssued} // Pass the handoff function here
+        onPOIssued={handlePOIssued} 
+        readOnly={selectedItem?.status === 'Finalized'} 
       />
     );
   }
   
-  // The new Print Engine router
   if (currentView === 'po-print' && poPrintData) {
     return (
       <PurchaseOrderPrintScreen 
@@ -112,25 +103,36 @@ export default function ProcurementHubScreen() {
     );
   }
 
-  // if (currentView === 'voucher-form') return <DebitVoucherScreen initialData={selectedItem} onBack={navigateToList} />;
+  // Calculate dynamic metrics for KPI Cards based on MOCK_DATA
+  const pendingCount = MOCK_DATA.filter(po => po.status === 'Pending').length;
+  const issuedCount = MOCK_DATA.filter(po => po.status === 'Issued').length;
+  const validStatuses = ['Pending'];//['Pending', 'Issued', 'Approved']; Only included pending
+
+  const totalAmount = MOCK_DATA
+    .filter(po => validStatuses.includes(po.status))
+    .reduce((sum, po) => sum + po.amount, 0);
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.headerContainer}>
-        <Text style={styles.screenTitle}>Procurement & Payables</Text>
-        <Text style={styles.subtitle}>Inbound Operations Hub</Text>
+        <Text style={styles.screenTitle}>Procurement Hub</Text>
+        <Text style={styles.subtitle}>Purchase Orders & Inbound Materials</Text>
       </View>
 
-      <ProcurementKPICards pendingPOs={14} totalPayables={450200} vouchersCleared={89} />
+      <ProcurementKPICards 
+        pendingPOs={pendingCount} 
+        issuedPOs={issuedCount} 
+        totalPendingAmmount={totalAmount} 
+      />
 
       <GlobalFilterBar<ProcurementTab>
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
-        searchPlaceholder="Search by ID or Vendor..."
+        searchPlaceholder="Search by PO Ref or Vendor..."
         tabs={PROCUREMENT_TABS}
         activeTab={activeTab}
         onTabChange={setActiveTab}
-        statusOptions={['All', 'Approved', 'Draft', 'Pending', 'Paid']}
+        statusOptions={['All', 'Issued', 'Approved', 'Pending', 'Finalized']}
         activeStatus={activeStatus}
         onStatusChange={setActiveStatus}
         dateFilter={dateFilter}
@@ -144,14 +146,9 @@ export default function ProcurementHubScreen() {
         onPrintReport={() => setCurrentView('report')}
         actions={[
           {
-            label: '+ New PO',
+            label: '+ New Purchase Order',
             onPress: () => { setSelectedItem(null); setCurrentView('po-form'); },
             buttonStyle: { backgroundColor: theme.colors.cyanGlow }
-          },
-          {
-            label: '+ New Voucher',
-            onPress: () => { setSelectedItem(null); setCurrentView('voucher-form'); },
-            buttonStyle: { backgroundColor: theme.colors.mintGlow }
           }
         ]}
       />

@@ -1,25 +1,32 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity, ScrollView, SafeAreaView, ActivityIndicator } from 'react-native';
-import { print } from 'react-native-unified-print';
 import { theme } from '../../theme/theme';
-import { PrintIcon } from '../../components/common/icons/MenuIcon';
-import { ProcurementEntry } from './components/ProcurementTable'; // Adjust path if needed
+import { ProcurementEntry } from './components/ProcurementTable'; 
 
 interface Props {
   initialData: ProcurementEntry | null;
   onBack: () => void;
-  onPOIssued: (poPayload: any) => void; // New prop for handoff
+  onPOIssued: (poPayload: any) => void;
+  readOnly?: boolean; 
 }
 
-export const PurchaseOrderScreen: React.FC<Props> = ({ initialData, onBack, onPOIssued }) => {
+const PO_STATUSES = ['Issued', 'Approved', 'Pending'];// 'Finalized']; Removed finalized as it can be only finalized once payments are completed
+
+export const PurchaseOrderScreen: React.FC<Props> = ({ initialData, onBack, onPOIssued, readOnly = false }) => {
   const [vendor, setVendor] = useState('');
   const [expectedDate, setExpectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [items, setItems] = useState([{ id: '1', material: '', qty: '', price: '' }]);
   const [description, setDescription] = useState('');
   const [invoiced, setInvoiced] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   
-  const status = initialData ? initialData.status : 'Pending';
+  // Status & Lock States
+  const [currentStatus, setCurrentStatus] = useState(initialData ? initialData.status : 'Issued');
+  const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
+  const [isStatusUpdating, setIsStatusUpdating] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Dynamic lock: Also locks if the user just finalized it in this session
+  const isFormLocked = readOnly || currentStatus === 'Finalized';
 
   // Calendar State
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
@@ -30,6 +37,7 @@ export const PurchaseOrderScreen: React.FC<Props> = ({ initialData, onBack, onPO
     if (initialData) {
       setVendor(initialData.vendor);
       setExpectedDate(initialData.date);
+      setCurrentStatus(initialData.status);
       setItems([{ id: '1', material: 'Populated Material', qty: '1', price: initialData.amount.toString() }]);
     }
   }, [initialData]);
@@ -60,37 +68,60 @@ export const PurchaseOrderScreen: React.FC<Props> = ({ initialData, onBack, onPO
     setSelectedYear(newYear);
   };
 
-  // The Server Push & Handoff
+  // Color mapper for statuses
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'Finalized': return theme.colors.mintGlow; // Green
+      case 'Approved': return '#3B82F6'; // Blue
+      case 'Pending': return '#F59E0B'; // Amber
+      case 'Issued':
+      default: return theme.colors.cyanGlow;
+    }
+  };
+
+  // Inline Server Update for Status Changes
+  const handleStatusChange = async (newStatus: string) => {
+    setIsStatusDropdownOpen(false);
+    if (newStatus === currentStatus) return;
+
+    setIsStatusUpdating(true); // Locks the screen
+    try {
+      // ---------------------------------------------------------
+      // 🚀 YOUR SERVER SYNC LOGIC FOR STATUS UPDATE HERE
+      // ---------------------------------------------------------
+      await new Promise(resolve => setTimeout(resolve, 1200)); 
+      setCurrentStatus(newStatus);
+    } catch (error) {
+      console.error("Failed to update status on server:", error);
+    } finally {
+      setIsStatusUpdating(false); // Unlocks the screen
+    }
+  };
+
+  // Full Form Submission
   const handleIssuePO = async () => {
-    if (isSubmitting) return;
-    setIsSubmitting(true);
+    if (isSubmitting || isStatusUpdating) return;
 
     const payload = {
-      // If initialData exists, use its ID, otherwise it's a new draft
       id: initialData ? initialData.id : `PO-${Date.now().toString().slice(-4)}`,
       vendor,
       expectedDate,
       items,
       description,
       invoiced,
-      status: 'Pending',
+      status: currentStatus,
       total: calculateTotal()
     };
-    
+
+    if (isFormLocked) {
+      if (onPOIssued) onPOIssued(payload);
+      return;
+    }
+
+    setIsSubmitting(true);
     try {
-      // ---------------------------------------------------------
-      // 🚀 YOUR SERVER SYNC LOGIC HERE
-      // ---------------------------------------------------------
-      // e.g., await axios.post('/api/purchase-orders', payload);
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulated network request
-      
-      console.log("Successfully pushed to server:", payload);
-      
-      // Handoff to the hub to switch to PurchaseOrderPrintScreen
-      // (Ensure your ProcurementHubScreen router passes this down!)
-      if (onPOIssued) {
-        onPOIssued(payload);
-      }
+      await new Promise(resolve => setTimeout(resolve, 1000)); 
+      if (onPOIssued) onPOIssued(payload);
     } catch (error) {
       console.error("Failed to push to server:", error);
       setIsSubmitting(false); 
@@ -99,13 +130,43 @@ export const PurchaseOrderScreen: React.FC<Props> = ({ initialData, onBack, onPO
 
   return (
     <SafeAreaView style={styles.container}>
+      
+      {/* Full Screen Loading Overlay for Status Updates */}
+      {isStatusUpdating && (
+        <View style={styles.loadingOverlay}>
+          <ActivityIndicator size="large" color={theme.colors.cyanGlow} />
+          <Text style={styles.loadingOverlayText}>Updating Server...</Text>
+        </View>
+      )}
+
       <View style={styles.navBar}>
-        <TouchableOpacity onPress={onBack} style={styles.backBtn} disabled={isSubmitting}>
+        <TouchableOpacity onPress={onBack} style={styles.backBtn} disabled={isSubmitting || isStatusUpdating}>
           <Text style={styles.backBtnText}>← Back to List</Text>
         </TouchableOpacity>
-        <Text style={styles.title}>{initialData ? `Edit ${initialData.id}` : 'Draft Purchase Order'}</Text>
-        <View style={styles.statusBadge}>
-          <Text style={styles.statusBadgeText}>{status}</Text>
+        
+        <Text style={styles.title}>{initialData ? `${isFormLocked ? 'View' : 'Edit'} ${initialData.id}` : 'Draft Purchase Order'}</Text>
+        
+        {/* Dynamic Dropdown Status Badge */}
+        <View style={{ zIndex: 50 }}>
+          <TouchableOpacity 
+            style={[styles.statusBadge, { borderColor: getStatusColor(currentStatus) }]}
+            onPress={() => !isFormLocked && setIsStatusDropdownOpen(!isStatusDropdownOpen)}
+            disabled={isFormLocked || isStatusUpdating}
+          >
+            <Text style={[styles.statusBadgeText, { color: getStatusColor(currentStatus) }]}>
+              {currentStatus} {!isFormLocked && ' ▼'}
+            </Text>
+          </TouchableOpacity>
+
+          {isStatusDropdownOpen && (
+            <View style={styles.statusDropdown}>
+              {PO_STATUSES.map(s => (
+                <TouchableOpacity key={s} style={styles.statusOption} onPress={() => handleStatusChange(s)}>
+                  <Text style={[styles.statusOptionText, { color: getStatusColor(s) }]}>{s}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
         </View>
       </View>
 
@@ -116,13 +177,13 @@ export const PurchaseOrderScreen: React.FC<Props> = ({ initialData, onBack, onPO
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Vendor / Supplier Address</Text>
               <TextInput 
-                style={[styles.input, { height: 80 }]} 
+                style={[styles.input, { height: 80 }, isFormLocked && styles.inputDisabled]} 
                 value={vendor} 
                 onChangeText={setVendor} 
                 multiline 
                 textAlignVertical="top" 
                 placeholderTextColor={theme.colors.textMuted} 
-                editable={!isSubmitting}
+                editable={!isSubmitting && !isFormLocked}
               />
             </View>
             
@@ -130,8 +191,8 @@ export const PurchaseOrderScreen: React.FC<Props> = ({ initialData, onBack, onPO
               <Text style={styles.label}>Expected Delivery</Text>
               <View style={{ zIndex: 10 }}>
                 <TouchableOpacity
-                  style={[styles.input, styles.datePickerButton, isSubmitting && { opacity: 0.5 }]}
-                  onPress={() => !isSubmitting && setIsDatePickerOpen(!isDatePickerOpen)}
+                  style={[styles.input, styles.datePickerButton, (isSubmitting || isFormLocked) && { opacity: 0.5 }]}
+                  onPress={() => !isSubmitting && !isFormLocked && setIsDatePickerOpen(!isDatePickerOpen)}
                   activeOpacity={0.8}
                 >
                   <Text style={{ color: theme.colors.textPrimary }}>{expectedDate}</Text>
@@ -172,8 +233,8 @@ export const PurchaseOrderScreen: React.FC<Props> = ({ initialData, onBack, onPO
           </View>
 
           <View style={styles.checkboxWrapper}>
-            <TouchableOpacity onPress={() => !isSubmitting && setInvoiced(!invoiced)} style={styles.checkboxContainer} activeOpacity={0.8}>
-              <View style={[styles.checkbox, invoiced && styles.checkboxActive]}>
+            <TouchableOpacity onPress={() => !isSubmitting && !isFormLocked && setInvoiced(!invoiced)} style={styles.checkboxContainer} activeOpacity={isFormLocked ? 1 : 0.8}>
+              <View style={[styles.checkbox, invoiced && styles.checkboxActive, isFormLocked && { opacity: 0.6 }]}>
                 {invoiced && <Text style={styles.checkmark}>✓</Text>}
               </View>
               <Text style={styles.checkboxLabel}>Mark as Invoiced</Text>
@@ -187,35 +248,37 @@ export const PurchaseOrderScreen: React.FC<Props> = ({ initialData, onBack, onPO
             <View key={item.id} style={styles.itemRow}>
               <View style={[styles.inputGroup, { flex: 2 }]}>
                 {index === 0 && <Text style={styles.label}>Material Name</Text>}
-                <TextInput style={styles.input} value={item.material} onChangeText={(val) => updateItem(item.id, 'material', val)} placeholderTextColor={theme.colors.textMuted} editable={!isSubmitting} />
+                <TextInput style={[styles.input, isFormLocked && styles.inputDisabled]} value={item.material} onChangeText={(val) => updateItem(item.id, 'material', val)} placeholderTextColor={theme.colors.textMuted} editable={!isSubmitting && !isFormLocked} />
               </View>
               <View style={[styles.inputGroup, { flex: 1 }]}>
                 {index === 0 && <Text style={styles.label}>Qty</Text>}
-                <TextInput style={styles.input} keyboardType="numeric" value={item.qty} onChangeText={(val) => updateItem(item.id, 'qty', val)} placeholderTextColor={theme.colors.textMuted} editable={!isSubmitting} />
+                <TextInput style={[styles.input, isFormLocked && styles.inputDisabled]} keyboardType="numeric" value={item.qty} onChangeText={(val) => updateItem(item.id, 'qty', val)} placeholderTextColor={theme.colors.textMuted} editable={!isSubmitting && !isFormLocked} />
               </View>
               <View style={[styles.inputGroup, { flex: 1 }]}>
                 {index === 0 && <Text style={styles.label}>Unit Price</Text>}
-                <TextInput style={styles.input} keyboardType="numeric" value={item.price} onChangeText={(val) => updateItem(item.id, 'price', val)} placeholderTextColor={theme.colors.textMuted} editable={!isSubmitting} />
+                <TextInput style={[styles.input, isFormLocked && styles.inputDisabled]} keyboardType="numeric" value={item.price} onChangeText={(val) => updateItem(item.id, 'price', val)} placeholderTextColor={theme.colors.textMuted} editable={!isSubmitting && !isFormLocked} />
               </View>
             </View>
           ))}
 
-          <TouchableOpacity style={styles.addRowBtn} onPress={() => !isSubmitting && setItems([...items, { id: Date.now().toString(), material: '', qty: '', price: '' }])}>
-            <Text style={styles.addRowText}>+ Add Material</Text>
-          </TouchableOpacity>
+          {!isFormLocked && (
+            <TouchableOpacity style={styles.addRowBtn} onPress={() => !isSubmitting && setItems([...items, { id: Date.now().toString(), material: '', qty: '', price: '' }])}>
+              <Text style={styles.addRowText}>+ Add Material</Text>
+            </TouchableOpacity>
+          )}
 
           <View style={styles.divider} />
           
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Description / Notes (Optional)</Text>
             <TextInput 
-              style={[styles.input, { height: 80 }]} 
+              style={[styles.input, { height: 80 }, isFormLocked && styles.inputDisabled]} 
               value={description} 
               onChangeText={setDescription} 
               multiline 
               textAlignVertical="top" 
               placeholderTextColor={theme.colors.textMuted}
-              editable={!isSubmitting} 
+              editable={!isSubmitting && !isFormLocked} 
             />
           </View>
 
@@ -228,7 +291,9 @@ export const PurchaseOrderScreen: React.FC<Props> = ({ initialData, onBack, onPO
               {isSubmitting ? (
                  <ActivityIndicator size="small" color="#000" />
               ) : (
-                <Text style={styles.submitBtnText}>{initialData ? 'Update PO & Print' : 'Issue PO & Print'}</Text>
+                <Text style={styles.submitBtnText}>
+                  {isFormLocked ? '🖨️ Print Document' : (initialData ? 'Update PO & Print' : 'Issue PO & Print')}
+                </Text>
               )}
             </TouchableOpacity>
           </View>
@@ -239,15 +304,21 @@ export const PurchaseOrderScreen: React.FC<Props> = ({ initialData, onBack, onPO
   );
 };
 
-
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: 'transparent' },
-  navBar: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20, backgroundColor: theme.colors.surfaceHeader, borderBottomWidth: 1, borderBottomColor: theme.colors.surfaceBorder },
+  loadingOverlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(15, 23, 42, 0.7)', zIndex: 9999, justifyContent: 'center', alignItems: 'center' },
+  loadingOverlayText: { color: theme.colors.textPrimary, marginTop: 16, fontSize: 16, fontWeight: '600', letterSpacing: 1 },
+  
+  navBar: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20, backgroundColor: theme.colors.surfaceHeader, borderBottomWidth: 1, borderBottomColor: theme.colors.surfaceBorder, zIndex: 100 },
   backBtn: { paddingVertical: 8, paddingHorizontal: 16, backgroundColor: theme.colors.surface, borderRadius: 8, borderWidth: 1, borderColor: theme.colors.surfaceBorder },
   backBtnText: { color: theme.colors.cyanGlow, fontSize: 14, fontWeight: 'bold' },
   title: { color: theme.colors.textPrimary, fontSize: 20, fontWeight: 'bold' },
-  statusBadge: { paddingHorizontal: 12, paddingVertical: 6, backgroundColor: 'rgba(6, 182, 212, 0.1)', borderRadius: 6, borderWidth: 1, borderColor: theme.colors.cyanGlow },
-  statusBadgeText: { color: theme.colors.cyanGlow, fontWeight: 'bold', fontSize: 12, textTransform: 'uppercase' },
+  
+  statusBadge: { paddingHorizontal: 16, paddingVertical: 8, backgroundColor: 'rgba(255, 255, 255, 0.05)', borderRadius: 8, borderWidth: 1 },
+  statusBadgeText: { fontWeight: 'bold', fontSize: 13, textTransform: 'uppercase' },
+  statusDropdown: { position: 'absolute', top: 45, right: 0, width: 140, backgroundColor: theme.colors.surfaceHeader, borderRadius: 8, borderWidth: 1, borderColor: theme.colors.surfaceBorder, overflow: 'hidden', elevation: 5, shadowColor: '#000', shadowOpacity: 0.5, shadowRadius: 10 },
+  statusOption: { paddingVertical: 12, paddingHorizontal: 16, borderBottomWidth: 1, borderBottomColor: theme.colors.surfaceBorder },
+  statusOptionText: { fontSize: 13, fontWeight: '700', textTransform: 'uppercase' },
   
   scrollContent: { padding: 32, alignItems: 'center' },
   formCard: { width: '100%', maxWidth: 900, backgroundColor: theme.colors.surface, borderRadius: 16, borderWidth: 1, borderColor: theme.colors.surfaceBorder, padding: 32, zIndex: 1 },
@@ -255,6 +326,7 @@ const styles = StyleSheet.create({
   inputGroup: { flex: 1, gap: 8 },
   label: { color: theme.colors.textSecondary, fontSize: 12, fontWeight: '700', textTransform: 'uppercase' },
   input: { backgroundColor: theme.colors.glassInput, color: theme.colors.textPrimary, borderWidth: 1, borderColor: theme.colors.surfaceBorder, borderRadius: 8, padding: 12, fontSize: 14 },
+  inputDisabled: { opacity: 0.6 },
   divider: { height: 1, backgroundColor: theme.colors.surfaceBorder, marginVertical: 24 },
   sectionTitle: { color: theme.colors.cyanGlow, fontSize: 14, fontWeight: '700', marginBottom: 16, textTransform: 'uppercase' },
   itemRow: { flexDirection: 'row', gap: 16, marginBottom: 12 },
@@ -290,10 +362,4 @@ const styles = StyleSheet.create({
   selectedDayCell: { backgroundColor: theme.colors.cyanGlow, borderRadius: 6 },
   dayText: { color: theme.colors.textPrimary, fontSize: 12 },
   selectedDayText: { color: '#000', fontWeight: 'bold' },
-
-  // Print Preview Card
-  previewCard: { backgroundColor: theme.colors.surface, borderRadius: 14, padding: 40, borderWidth: 1, borderColor: theme.colors.surfaceBorder, alignItems: 'center', maxWidth: 580, alignSelf: 'center', marginTop: 40, gap: 12 },
-  previewText: { color: theme.colors.textPrimary, fontSize: 18, fontWeight: 'bold', textAlign: 'center', marginTop: 8 },
-  previewSubtext: { color: theme.colors.textMuted, fontSize: 14, textAlign: 'center', lineHeight: 22, marginBottom: 16 },
-  errorText: { color: theme.colors.pinkGlow, fontSize: 12, fontWeight: '600' },
 });
