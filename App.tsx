@@ -8,6 +8,8 @@ import BusinessPartnersListScreen from './src/features/BusinessPartners/Business
 import InventoryModule from './src/features/Inventory/InventoryModule';
 import ProcurementHubScreen from './src/features/procurement/procurementHubScreen';
 import CostingScreen from './src/features/costing/CostingScreen';
+import PayablesHubScreen from './src/features/payables/PayablesHubScreen';
+import ReceivablesHubScreen from './src/features/receivables/ReceivablesHubScreen';
 // TODO: Remove
 // Placeholder screen for future modules
 function PlaceholderScreen({ title }: { title: string }) {
@@ -27,6 +29,8 @@ export default function App() {
         return <Dashboard />;
       case 'prices':
         return <ProcurementHubScreen/>;
+      case 'payables':
+        return <PayablesHubScreen/>;
       case 'formulas':
         return <CostingScreen/>;
       case 'production':
@@ -39,6 +43,8 @@ export default function App() {
         return <ChallansScreen />;
       case 'BusinessPartners':
         return <BusinessPartnersListScreen />;
+      case 'receivables':
+        return <ReceivablesHubScreen/>;
       default:
         return <Dashboard />;
     }

@@ -11,7 +11,6 @@ import {
   OrderCartIcon,
   InvoiceIcon} 
   from '../components/common/icons/MenuIcon';
-import { CompanyLogoIcon } from '../assets/CompanyLogo';
 export const NAV_ITEMS: NavItem[] = [
   { 
     id: 'dashboard', 
@@ -22,6 +21,8 @@ export const NAV_ITEMS: NavItem[] = [
     },
   { id: 'prices', title: 'Price / Unit', icon: RupeeIcon,
     },
+  { id: 'payables', title: 'Accounts Payable', icon: RupeeIcon,
+    },  
   { id: 'formulas', title: 'Cookbook',icon: FlaskIcon
     },
   { id: 'production', title: 'Production', icon: FactoryIcon,
@@ -37,5 +38,7 @@ export const NAV_ITEMS: NavItem[] = [
   { id: 'delivery_challan', title: 'Delivery Challan', icon: DeliveryChallanIcon,
      },
   { id: 'BusinessPartners', title: 'Businesses', icon: DeliveryChallanIcon,
+     },
+  { id: 'receivables', title: 'Receivables', icon: RupeeIcon,
      },
 ];
