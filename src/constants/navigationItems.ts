@@ -17,28 +17,57 @@ export const NAV_ITEMS: NavItem[] = [
     title: 'Dashboard', 
     icon: DashboardIcon, 
   },
-  { id: 'order', title: 'Order', icon: OrderCartIcon,
-    },
-  { id: 'prices', title: 'Price / Unit', icon: RupeeIcon,
-    },
-  { id: 'payables', title: 'Accounts Payable', icon: RupeeIcon,
-    },  
-  { id: 'formulas', title: 'Cookbook',icon: FlaskIcon
-    },
-  { id: 'production', title: 'Production', icon: FactoryIcon,
-    },
-  { id: 'inventory', title: 'Inventory', icon: InventoryIcon,
-    },
-  { id: 'ledger', title: 'Ledger', icon: LedgerIcon,
-     },
-  { id: 'challan', title: 'Challan', icon: ChallanIcon,
-     },
   { id: 'invoice', title: 'Invoice', icon: InvoiceIcon,
-     },
-  { id: 'delivery_challan', title: 'Delivery Challan', icon: DeliveryChallanIcon,
-     },
-  { id: 'BusinessPartners', title: 'Businesses', icon: DeliveryChallanIcon,
-     },
-  { id: 'receivables', title: 'Receivables', icon: RupeeIcon,
-     },
+  },
+  { 
+    id: 'delivery_challan', 
+    title: 'Delivery Challan', 
+    icon: DeliveryChallanIcon,
+  },
+  { 
+    id: 'receivables', 
+    title: 'Receivables', 
+    icon: RupeeIcon,
+  },
+  { 
+    id: 'purchases', 
+    title: 'Purchase Order', 
+    icon: OrderCartIcon,
+  },
+  { 
+    id: 'payables', 
+    title: 'Accounts Payable', 
+    icon: RupeeIcon,
+  },  
+  { 
+    id: 'formulas', 
+    title: 'Cookbook',
+    icon: FlaskIcon
+  },
+  { 
+    id: 'prices', 
+    title: 'Price / Unit', 
+    icon: RupeeIcon,
+  },
+  { 
+    id: 'ledger', 
+    title: 'Ledger', 
+    icon: LedgerIcon,
+  },
+  { 
+    id: 'inventory', 
+    title: 'Inventory', 
+    icon: InventoryIcon,
+  },
+  { 
+    id: 'BusinessPartners', 
+    title: 'Businesses', 
+    icon: DeliveryChallanIcon,
+  },
+  // { id: 'production', title: 'Production', icon: FactoryIcon, //add later
+  // },
+//////////////////no longer needed//////////////////////////////////////
+
+  //  { id: 'challan', title: 'Challan', icon: ChallanIcon,
+  //    },
 ];

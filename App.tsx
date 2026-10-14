@@ -27,7 +27,7 @@ export default function App() {
     switch (activeScreen) {
       case 'dashboard':
         return <Dashboard />;
-      case 'prices':
+      case 'purchases':
         return <ProcurementHubScreen/>;
       case 'payables':
         return <PayablesHubScreen/>;
@@ -39,7 +39,7 @@ export default function App() {
         return <InventoryModule/>;
       case 'ledger':
         return <LedgerScreen />;
-      case 'challan':
+      case 'delivery_challan':
         return <ChallansScreen />;
       case 'BusinessPartners':
         return <BusinessPartnersListScreen />;
